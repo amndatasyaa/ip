@@ -121,7 +121,7 @@ What can I do for you?
 ____________________________________________________________
  OOPS! Please tell me what to add after 'todo'.
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, or unmark.
+ OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.
 ____________________________________________________________
  Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -171,7 +171,7 @@ ____________________________________________________________
 ____________________________________________________________
  OOPS! 'abc' is not a valid task number.
 ____________________________________________________________
- OOPS! Your task list is empty, so there is nothing to mark or unmark.
+ OOPS! Your task list is empty, so there is no task to mark.
 ____________________________________________________________
  Got it. I've added this task:
    [T][ ] read book
@@ -195,6 +195,7 @@ deadline beta /by Friday
 todo
 deadline gamma
 event delta /from Monday
+event meeting /to Tue /from Mon
 event meeting /from Mon /to Tue
 list
 deadline /by Sunday
@@ -227,6 +228,8 @@ ____________________________________________________________
  OOPS! Please tell me what to add after 'todo'.
 ____________________________________________________________
  OOPS! Please use: deadline <description> /by <date or time>.
+____________________________________________________________
+ OOPS! Please use: event <description> /from <start> /to <end>.
 ____________________________________________________________
  OOPS! Please use: event <description> /from <start> /to <end>.
 ____________________________________________________________
@@ -357,7 +360,7 @@ ____________________________________________________________
 Hi! I'm Snoopy, your happy little helper.
 What can I do for you?
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, or unmark.
+ OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.
 ____________________________________________________________
  Got it. I've added this task:
    [T][ ] spaced task
@@ -369,10 +372,248 @@ ____________________________________________________________
 ____________________________________________________________
  OOPS! '1 extra' is not a valid task number.
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, or unmark.
+ OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.
 ____________________________________________________________
  Here are the tasks in your list:
  1.[T][ ] spaced task
+____________________________________________________________
+ Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## UI-08: Delete tasks while preserving shifted objects and statuses
+
+**Aim:** Verify that deleting middle, first, and final tasks shifts indexes correctly while preserving the type and completion status of each remaining object.
+
+### Input
+
+```text
+todo first
+deadline second /by Friday
+event third /from Mon /to Tue
+mark 3
+delete 2
+delete 3
+list
+unmark 2
+delete 1
+list
+delete 1
+list
+bye
+```
+
+### Expected output
+
+```text
+____________________________________________________________
+  ____
+ / ___| _ __   ___   ___  _ __  _   _
+ \___ \| '_ \ / _ \ / _ \| '_ \| | | |
+  ___) | | | | (_) | (_) | |_) | |_| |
+ |____/|_| |_|\___/ \___/| .__/ \__, |
+                            |_|    |___/
+Hi! I'm Snoopy, your happy little helper.
+What can I do for you?
+____________________________________________________________
+ Got it. I've added this task:
+   [T][ ] first
+ Now you have 1 tasks in the list.
+____________________________________________________________
+ Got it. I've added this task:
+   [D][ ] second (by: Friday)
+ Now you have 2 tasks in the list.
+____________________________________________________________
+ Got it. I've added this task:
+   [E][ ] third (from: Mon to: Tue)
+ Now you have 3 tasks in the list.
+____________________________________________________________
+ Nice! I've marked this task as done:
+   [E][X] third (from: Mon to: Tue)
+____________________________________________________________
+ Noted. I've removed this task:
+   [D][ ] second (by: Friday)
+ Now you have 2 tasks in the list.
+____________________________________________________________
+ OOPS! Task 3 does not exist. Choose a number from 1 to 2.
+____________________________________________________________
+ Here are the tasks in your list:
+ 1.[T][ ] first
+ 2.[E][X] third (from: Mon to: Tue)
+____________________________________________________________
+ OK, I've marked this task as not done yet:
+   [E][ ] third (from: Mon to: Tue)
+____________________________________________________________
+ Noted. I've removed this task:
+   [T][ ] first
+ Now you have 1 tasks in the list.
+____________________________________________________________
+ Here are the tasks in your list:
+ 1.[E][ ] third (from: Mon to: Tue)
+____________________________________________________________
+ Noted. I've removed this task:
+   [E][ ] third (from: Mon to: Tue)
+ Now you have 0 tasks in the list.
+____________________________________________________________
+ Here are the tasks in your list:
+____________________________________________________________
+ Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## UI-09: Operations remain safe after deletion empties and repopulates the list
+
+**Aim:** Verify that mark, unmark, and delete fail safely after the final task is deleted and that a subsequently added task starts a clean list at index one.
+
+### Input
+
+```text
+todo sole
+mark 1
+delete 1
+mark 1
+unmark 1
+delete 1
+todo replacement
+list
+bye
+```
+
+### Expected output
+
+```text
+____________________________________________________________
+  ____
+ / ___| _ __   ___   ___  _ __  _   _
+ \___ \| '_ \ / _ \ / _ \| '_ \| | | |
+  ___) | | | | (_) | (_) | |_) | |_| |
+ |____/|_| |_|\___/ \___/| .__/ \__, |
+                            |_|    |___/
+Hi! I'm Snoopy, your happy little helper.
+What can I do for you?
+____________________________________________________________
+ Got it. I've added this task:
+   [T][ ] sole
+ Now you have 1 tasks in the list.
+____________________________________________________________
+ Nice! I've marked this task as done:
+   [T][X] sole
+____________________________________________________________
+ Noted. I've removed this task:
+   [T][X] sole
+ Now you have 0 tasks in the list.
+____________________________________________________________
+ OOPS! Your task list is empty, so there is no task to mark.
+____________________________________________________________
+ OOPS! Your task list is empty, so there is no task to unmark.
+____________________________________________________________
+ OOPS! Your task list is empty, so there is no task to delete.
+____________________________________________________________
+ Got it. I've added this task:
+   [T][ ] replacement
+ Now you have 1 tasks in the list.
+____________________________________________________________
+ Here are the tasks in your list:
+ 1.[T][ ] replacement
+____________________________________________________________
+ Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## UI-10: Bye terminates processing immediately
+
+**Aim:** Verify that commands already buffered after bye are ignored and cannot mutate or display application state.
+
+### Input
+
+```text
+bye
+todo must not appear
+list
+```
+
+### Expected output
+
+```text
+____________________________________________________________
+  ____
+ / ___| _ __   ___   ___  _ __  _   _
+ \___ \| '_ \ / _ \ / _ \| '_ \| | | |
+  ___) | | | | (_) | (_) | |_) | |_| |
+ |____/|_| |_|\___/ \___/| .__/ \__, |
+                            |_|    |___/
+Hi! I'm Snoopy, your happy little helper.
+What can I do for you?
+____________________________________________________________
+ Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## UI-11: Invalid delete commands preserve the list
+
+**Aim:** Verify that missing, non-numeric, zero, and out-of-range delete indexes leave task order and completion states unchanged before a valid deletion.
+
+### Input
+
+```text
+delete 1
+todo keep
+todo remove
+mark 1
+delete
+delete abc
+delete 0
+delete 3
+list
+delete 2
+list
+bye
+```
+
+### Expected output
+
+```text
+____________________________________________________________
+  ____
+ / ___| _ __   ___   ___  _ __  _   _
+ \___ \| '_ \ / _ \ / _ \| '_ \| | | |
+  ___) | | | | (_) | (_) | |_) | |_| |
+ |____/|_| |_|\___/ \___/| .__/ \__, |
+                            |_|    |___/
+Hi! I'm Snoopy, your happy little helper.
+What can I do for you?
+____________________________________________________________
+ OOPS! Your task list is empty, so there is no task to delete.
+____________________________________________________________
+ Got it. I've added this task:
+   [T][ ] keep
+ Now you have 1 tasks in the list.
+____________________________________________________________
+ Got it. I've added this task:
+   [T][ ] remove
+ Now you have 2 tasks in the list.
+____________________________________________________________
+ Nice! I've marked this task as done:
+   [T][X] keep
+____________________________________________________________
+ OOPS! Please provide a task number, for example 'delete 2'.
+____________________________________________________________
+ OOPS! 'abc' is not a valid task number.
+____________________________________________________________
+ OOPS! Task 0 does not exist. Choose a number from 1 to 2.
+____________________________________________________________
+ OOPS! Task 3 does not exist. Choose a number from 1 to 2.
+____________________________________________________________
+ Here are the tasks in your list:
+ 1.[T][X] keep
+ 2.[T][ ] remove
+____________________________________________________________
+ Noted. I've removed this task:
+   [T][ ] remove
+ Now you have 1 tasks in the list.
+____________________________________________________________
+ Here are the tasks in your list:
+ 1.[T][X] keep
 ____________________________________________________________
  Bye. Hope to see you again soon!
 ____________________________________________________________
