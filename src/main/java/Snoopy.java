@@ -43,6 +43,12 @@ public class Snoopy {
                     String status = isDone[i] ? "X" : " ";
                     System.out.println(" " + (i + 1) + ".[" + status + "] " + tasks[i]);
                 }
+            } else if (command.startsWith("unmark ")) {
+                int taskNumber = Integer.parseInt(command.substring(7));
+                int taskIndex = taskNumber - 1;
+                isDone[taskIndex] = false;
+                System.out.println(" OK, I've marked this task as not done yet:");
+                System.out.println("   [ ] " + tasks[taskIndex]);
             } else if (command.startsWith("mark ")) {
                 int taskNumber = Integer.parseInt(command.substring(5));
                 int taskIndex = taskNumber - 1;
