@@ -343,6 +343,8 @@ deadline report /by
 event review /from Mon /to
 mark 1 extra
 LIST
+list extra
+bye extra
 list
 bye
 ```
@@ -371,6 +373,10 @@ ____________________________________________________________
  OOPS! Please use: event <description> /from <start> /to <end>.
 ____________________________________________________________
  OOPS! '1 extra' is not a valid task number.
+____________________________________________________________
+ OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.
+____________________________________________________________
+ OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.
 ____________________________________________________________
  OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.
 ____________________________________________________________

@@ -27,42 +27,47 @@ public class Snoopy {
 
         ArrayList<Task> tasks = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
+        chatLoop:
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine().trim();
-
-            if (command.equals("bye")) {
-                System.out.println(" Bye. Hope to see you again soon!");
-                System.out.println(divider);
-                break;
-            }
+            CommandType commandType = CommandType.fromCommand(command);
 
             try {
-                if (command.equals("list")) {
+                switch (commandType) {
+                case BYE:
+                    System.out.println(" Bye. Hope to see you again soon!");
+                    System.out.println(divider);
+                    break chatLoop;
+                case LIST:
                     System.out.println(" Here are the tasks in your list:");
                     for (int i = 0; i < tasks.size(); i++) {
                         System.out.println(" " + (i + 1) + "." + tasks.get(i));
                     }
-                } else if (command.equals("unmark") || command.startsWith("unmark ")) {
-                    String numberText = command.substring(6).trim();
-                    int taskIndex = parseTaskIndex(numberText, tasks.size(), "unmark");
+                    break;
+                case UNMARK:
+                    String numberText = command.substring(commandType.getKeyword().length()).trim();
+                    int taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     tasks.get(taskIndex).markAsNotDone();
                     System.out.println(" OK, I've marked this task as not done yet:");
                     System.out.println("   " + tasks.get(taskIndex));
-                } else if (command.equals("mark") || command.startsWith("mark ")) {
-                    String numberText = command.substring(4).trim();
-                    int taskIndex = parseTaskIndex(numberText, tasks.size(), "mark");
+                    break;
+                case MARK:
+                    numberText = command.substring(commandType.getKeyword().length()).trim();
+                    taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     tasks.get(taskIndex).markAsDone();
                     System.out.println(" Nice! I've marked this task as done:");
                     System.out.println("   " + tasks.get(taskIndex));
-                } else if (command.equals("delete") || command.startsWith("delete ")) {
-                    String numberText = command.substring(6).trim();
-                    int taskIndex = parseTaskIndex(numberText, tasks.size(), "delete");
+                    break;
+                case DELETE:
+                    numberText = command.substring(commandType.getKeyword().length()).trim();
+                    taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     Task removedTask = tasks.remove(taskIndex);
                     System.out.println(" Noted. I've removed this task:");
                     System.out.println("   " + removedTask);
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
-                } else if (command.equals("todo") || command.startsWith("todo ")) {
-                    String description = command.substring(4).trim();
+                    break;
+                case TODO:
+                    String description = command.substring(commandType.getKeyword().length()).trim();
                     if (description.isEmpty()) {
                         throw new SnoopyException("Please tell me what to add after 'todo'.");
                     }
@@ -71,24 +76,26 @@ public class Snoopy {
                     System.out.println(" Got it. I've added this task:");
                     System.out.println("   " + task);
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
-                } else if (command.equals("deadline") || command.startsWith("deadline ")) {
+                    break;
+                case DEADLINE:
                     int byIndex = command.indexOf(" /by ");
                     if (byIndex < 0) {
                         throw new SnoopyException(
                                 "Please use: deadline <description> /by <date or time>.");
                     }
-                    String description = command.substring(8, byIndex).trim();
+                    description = command.substring(commandType.getKeyword().length(), byIndex).trim();
                     String by = command.substring(byIndex + 5).trim();
                     if (description.isEmpty() || by.isEmpty()) {
                         throw new SnoopyException(
                                 "A deadline needs both a description and a '/by' value.");
                     }
-                    Task task = new Deadline(description, by);
+                    task = new Deadline(description, by);
                     tasks.add(task);
                     System.out.println(" Got it. I've added this task:");
                     System.out.println("   " + task);
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
-                } else if (command.equals("event") || command.startsWith("event ")) {
+                    break;
+                case EVENT:
                     int fromIndex = command.indexOf(" /from ");
                     int toIndex = command.indexOf(" /to ");
                     if (fromIndex < 0 || toIndex < 0 || fromIndex >= toIndex) {
@@ -99,19 +106,20 @@ public class Snoopy {
                         throw new SnoopyException(
                                 "An event needs a description, a '/from' value, and a '/to' value.");
                     }
-                    String description = command.substring(5, fromIndex).trim();
+                    description = command.substring(commandType.getKeyword().length(), fromIndex).trim();
                     String from = command.substring(fromIndex + 7, toIndex).trim();
                     String to = command.substring(toIndex + 5).trim();
                     if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
                         throw new SnoopyException(
                                 "An event needs a description, a '/from' value, and a '/to' value.");
                     }
-                    Task task = new Event(description, from, to);
+                    task = new Event(description, from, to);
                     tasks.add(task);
                     System.out.println(" Got it. I've added this task:");
                     System.out.println("   " + task);
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
-                } else {
+                    break;
+                case UNKNOWN:
                     throw new SnoopyException(
                             "Sorry, I don't recognize that command. "
                                     + "Try todo, deadline, event, list, mark, unmark, or delete.");
@@ -128,15 +136,16 @@ public class Snoopy {
      *
      * @param numberText task number entered by the user
      * @param taskCount number of tasks currently stored
-     * @param commandName command that requires the task number
+     * @param commandType command that requires the task number
      * @return the zero-based index of the selected task
      * @throws SnoopyException if the number is missing, non-numeric, or outside the list
      */
-    private static int parseTaskIndex(String numberText, int taskCount, String commandName)
+    private static int parseTaskIndex(String numberText, int taskCount, CommandType commandType)
             throws SnoopyException {
         if (numberText.isEmpty()) {
             throw new SnoopyException(
-                    "Please provide a task number, for example '" + commandName + " 2'.");
+                    "Please provide a task number, for example '"
+                            + commandType.getKeyword() + " 2'.");
         }
 
         int taskNumber;
@@ -148,7 +157,8 @@ public class Snoopy {
 
         if (taskCount == 0) {
             throw new SnoopyException(
-                    "Your task list is empty, so there is no task to " + commandName + ".");
+                    "Your task list is empty, so there is no task to "
+                            + commandType.getKeyword() + ".");
         }
         if (taskNumber < 1 || taskNumber > taskCount) {
             throw new SnoopyException(
