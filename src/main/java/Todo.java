@@ -12,6 +12,16 @@ public class Todo extends Task {
     }
 
     /**
+     * Converts this todo into one line of saved data.
+     *
+     * @return saved todo data
+     */
+    @Override
+    public String toDataString() {
+        return "T | " + super.toDataString();
+    }
+
+    /**
      * Returns this task with the todo type indicator.
      *
      * @return the formatted todo task

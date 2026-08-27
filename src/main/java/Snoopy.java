@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -25,7 +26,19 @@ public class Snoopy {
         System.out.println("What can I do for you?");
         System.out.println(divider);
 
-        ArrayList<Task> tasks = new ArrayList<>();
+        Storage storage = new Storage();
+        ArrayList<Task> tasks;
+        try {
+            tasks = storage.load();
+        } catch (SnoopyException exception) {
+            tasks = new ArrayList<>();
+            System.out.println(" OOPS! " + exception.getMessage());
+            System.out.println(divider);
+        } catch (IOException exception) {
+            tasks = new ArrayList<>();
+            System.out.println(" OOPS! I couldn't load the saved tasks.");
+            System.out.println(divider);
+        }
         Scanner scanner = new Scanner(System.in);
         chatLoop:
         while (scanner.hasNextLine()) {
@@ -48,6 +61,7 @@ public class Snoopy {
                     String numberText = command.substring(commandType.getKeyword().length()).trim();
                     int taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     tasks.get(taskIndex).markAsNotDone();
+                    storage.save(tasks);
                     System.out.println(" OK, I've marked this task as not done yet:");
                     System.out.println("   " + tasks.get(taskIndex));
                     break;
@@ -55,6 +69,7 @@ public class Snoopy {
                     numberText = command.substring(commandType.getKeyword().length()).trim();
                     taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     tasks.get(taskIndex).markAsDone();
+                    storage.save(tasks);
                     System.out.println(" Nice! I've marked this task as done:");
                     System.out.println("   " + tasks.get(taskIndex));
                     break;
@@ -62,6 +77,7 @@ public class Snoopy {
                     numberText = command.substring(commandType.getKeyword().length()).trim();
                     taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     Task removedTask = tasks.remove(taskIndex);
+                    storage.save(tasks);
                     System.out.println(" Noted. I've removed this task:");
                     System.out.println("   " + removedTask);
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -73,6 +89,7 @@ public class Snoopy {
                     }
                     Task task = new Todo(description);
                     tasks.add(task);
+                    storage.save(tasks);
                     System.out.println(" Got it. I've added this task:");
                     System.out.println("   " + task);
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -91,6 +108,7 @@ public class Snoopy {
                     }
                     task = new Deadline(description, by);
                     tasks.add(task);
+                    storage.save(tasks);
                     System.out.println(" Got it. I've added this task:");
                     System.out.println("   " + task);
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -115,6 +133,7 @@ public class Snoopy {
                     }
                     task = new Event(description, from, to);
                     tasks.add(task);
+                    storage.save(tasks);
                     System.out.println(" Got it. I've added this task:");
                     System.out.println("   " + task);
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -126,6 +145,8 @@ public class Snoopy {
                 }
             } catch (SnoopyException exception) {
                 System.out.println(" OOPS! " + exception.getMessage());
+            } catch (IOException exception) {
+                System.out.println(" OOPS! I couldn't save the task list.");
             }
             System.out.println(divider);
         }
