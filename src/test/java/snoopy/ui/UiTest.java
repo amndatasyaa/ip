@@ -53,6 +53,19 @@ public class UiTest {
                 output.toString(StandardCharsets.UTF_8));
     }
 
+    @Test
+    public void showMatchingTasks_matches_printsMatchingHeadingAndRenumberedTasks() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        Ui ui = createUi("", output);
+        TaskList matches = new TaskList();
+        matches.add(new Todo("first match"));
+
+        ui.showMatchingTasks(matches);
+
+        assertEquals(" Here are the matching tasks in your list:\n"
+                + " 1.[T][ ] first match\n", output.toString(StandardCharsets.UTF_8));
+    }
+
     private Ui createUi(String input, ByteArrayOutputStream output) {
         Scanner scanner = new Scanner(input);
         PrintStream printStream = new PrintStream(output, true, StandardCharsets.UTF_8);

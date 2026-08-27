@@ -22,6 +22,7 @@ public class ParserTest {
         assertEquals(CommandType.BYE, Parser.parseCommandType("bye"));
         assertEquals(CommandType.LIST, Parser.parseCommandType("list"));
         assertEquals(CommandType.MARK, Parser.parseCommandType("mark 2"));
+        assertEquals(CommandType.FIND, Parser.parseCommandType("find book"));
         assertEquals(CommandType.TODO, Parser.parseCommandType("todo   read book"));
         assertEquals(CommandType.UNKNOWN, Parser.parseCommandType(""));
         assertEquals(CommandType.UNKNOWN, Parser.parseCommandType("TODO read book"));
@@ -85,6 +86,16 @@ public class ParserTest {
                 "mark 1", 0);
         assertIndexError("Task 3 does not exist. Choose a number from 1 to 2.",
                 "mark 3", 2);
+    }
+
+    @Test
+    public void parseFindKeyword_presentAndMissingKeyword_returnsOrRejectsKeyword()
+            throws SnoopyException {
+        assertEquals("book", Parser.parseFindKeyword("find book"));
+
+        SnoopyException exception = assertThrows(SnoopyException.class,
+                () -> Parser.parseFindKeyword("find"));
+        assertEquals("Please provide a keyword to find.", exception.getMessage());
     }
 
     private void assertParsingError(String expectedMessage, String command,

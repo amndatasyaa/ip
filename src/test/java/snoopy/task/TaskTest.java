@@ -1,6 +1,10 @@
 package snoopy.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,5 +41,15 @@ public class TaskTest {
         todo.markAsDone();
         assertEquals("T | 1 | read book", todo.toDataString());
         assertEquals("[T][X] read book", todo.toString());
+    }
+
+    @Test
+    public void containsKeyword_exactSubstring_matchesDescriptionOnly() {
+        Task task = new Deadline("return Book", LocalDate.of(2026, 8, 30));
+
+        assertTrue(task.containsKeyword("return"));
+        assertTrue(task.containsKeyword("Book"));
+        assertFalse(task.containsKeyword("book"));
+        assertFalse(task.containsKeyword("Aug 30"));
     }
 }

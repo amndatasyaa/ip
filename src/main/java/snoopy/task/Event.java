@@ -12,15 +12,15 @@ public class Event extends Task {
     private static final DateTimeFormatter DISPLAY_DATE_FORMAT =
             DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
 
-    protected LocalDate from;
-    protected LocalDate to;
+    private final LocalDate from;
+    private final LocalDate to;
 
     /**
      * Creates an incomplete event task.
      *
-     * @param description text describing the event
-     * @param from start date
-     * @param to end date
+     * @param description Text describing the event.
+     * @param from Start date.
+     * @param to End date.
      */
     public Event(String description, LocalDate from, LocalDate to) {
         super(description);
@@ -31,7 +31,7 @@ public class Event extends Task {
     /**
      * Converts this event into one line of saved data.
      *
-     * @return saved event data
+     * @return Saved event data.
      */
     @Override
     public String toDataString() {
@@ -41,7 +41,7 @@ public class Event extends Task {
     /**
      * Returns this task with its type, start time, and end time.
      *
-     * @return the formatted event task
+     * @return The formatted event task.
      */
     @Override
     public String toString() {

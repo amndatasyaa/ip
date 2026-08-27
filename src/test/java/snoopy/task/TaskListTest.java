@@ -50,4 +50,19 @@ public class TaskListTest {
         assertThrows(UnsupportedOperationException.class, iterator::remove);
         assertEquals(1, tasks.size());
     }
+
+    @Test
+    public void find_matchingDescriptions_returnsMatchesInOriginalOrder() {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("read book"));
+        tasks.add(new Todo("call Alice"));
+        tasks.add(new Todo("return book"));
+
+        TaskList matches = tasks.find("book");
+
+        assertEquals(2, matches.size());
+        assertEquals("[T][ ] read book", matches.get(0).toString());
+        assertEquals("[T][ ] return book", matches.get(1).toString());
+        assertEquals(3, tasks.size());
+    }
 }

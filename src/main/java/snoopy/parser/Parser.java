@@ -102,6 +102,21 @@ public final class Parser {
         return taskNumber - 1;
     }
 
+    /**
+     * Extracts the required keyword from a find command.
+     *
+     * @param command complete find command entered by the user
+     * @return non-empty keyword to search for
+     * @throws SnoopyException if the command has no keyword
+     */
+    public static String parseFindKeyword(String command) throws SnoopyException {
+        String keyword = command.substring(CommandType.FIND.getKeyword().length()).trim();
+        if (keyword.isEmpty()) {
+            throw new SnoopyException("Please provide a keyword to find.");
+        }
+        return keyword;
+    }
+
     private static Todo parseTodo(String command) throws SnoopyException {
         String description = command.substring(CommandType.TODO.getKeyword().length()).trim();
         if (description.isEmpty()) {

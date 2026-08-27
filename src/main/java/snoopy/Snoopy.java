@@ -84,6 +84,10 @@ public class Snoopy {
                     storage.save(tasks);
                     ui.showTaskDeleted(removedTask, tasks.size());
                     break;
+                case FIND:
+                    String keyword = Parser.parseFindKeyword(command);
+                    ui.showMatchingTasks(tasks.find(keyword));
+                    break;
                 case TODO:
                 case DEADLINE:
                 case EVENT:
@@ -95,7 +99,7 @@ public class Snoopy {
                 case UNKNOWN:
                     throw new SnoopyException(
                             "Sorry, I don't recognize that command. "
-                                    + "Try todo, deadline, event, list, mark, unmark, or delete.");
+                                    + "Try todo, deadline, event, list, mark, unmark, delete, or find.");
                 }
             } catch (SnoopyException exception) {
                 ui.showError(exception.getMessage());
