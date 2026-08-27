@@ -3,7 +3,6 @@ package snoopy;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.Scanner;
 
 import snoopy.command.CommandType;
 import snoopy.exception.SnoopyException;
@@ -13,86 +12,84 @@ import snoopy.task.Event;
 import snoopy.task.Task;
 import snoopy.task.TaskList;
 import snoopy.task.Todo;
+import snoopy.ui.Ui;
 
 /**
  * Starts the Snoopy chatbot application.
  */
 public class Snoopy {
+    private final Storage storage;
+    private final Ui ui;
+    private TaskList tasks;
+
+    /**
+     * Creates a chatbot using the standard console and data file.
+     */
+    public Snoopy() {
+        this.storage = new Storage();
+        this.ui = new Ui();
+    }
+
     /**
      * Runs the chatbot until the user enters {@code bye}.
      *
      * @param args command-line arguments; not used by this application
      */
     public static void main(String[] args) {
-        String divider = "____________________________________________________________";
-        String banner = "  ____\n"
-                + " / ___| _ __   ___   ___  _ __  _   _\n"
-                + " \\___ \\| '_ \\ / _ \\ / _ \\| '_ \\| | | |\n"
-                + "  ___) | | | | (_) | (_) | |_) | |_| |\n"
-                + " |____/|_| |_|\\___/ \\___/| .__/ \\__, |\n"
-                + "                            |_|    |___/";
+        new Snoopy().run();
+    }
 
-        System.out.println(divider);
-        System.out.println(banner);
-        System.out.println("Hi! I'm Snoopy, your happy little helper.");
-        System.out.println("What can I do for you?");
-        System.out.println(divider);
-
-        Storage storage = new Storage();
-        TaskList tasks;
+    /**
+     * Runs the chatbot until the user enters {@code bye} or input ends.
+     */
+    public void run() {
+        ui.showWelcome();
         try {
             tasks = new TaskList(storage.load());
         } catch (SnoopyException exception) {
             tasks = new TaskList();
-            System.out.println(" OOPS! " + exception.getMessage());
-            System.out.println(divider);
+            ui.showError(exception.getMessage());
+            ui.showLine();
         } catch (IOException exception) {
             tasks = new TaskList();
-            System.out.println(" OOPS! I couldn't load the saved tasks.");
-            System.out.println(divider);
+            ui.showLoadingError();
+            ui.showLine();
         }
-        Scanner scanner = new Scanner(System.in);
+
         chatLoop:
-        while (scanner.hasNextLine()) {
-            String command = scanner.nextLine().trim();
+        while (ui.hasNextCommand()) {
+            String command = ui.readCommand();
             CommandType commandType = CommandType.fromCommand(command);
 
             try {
                 switch (commandType) {
                 case BYE:
-                    System.out.println(" Bye. Hope to see you again soon!");
-                    System.out.println(divider);
+                    ui.showGoodbye();
+                    ui.showLine();
                     break chatLoop;
                 case LIST:
-                    System.out.println(" Here are the tasks in your list:");
-                    for (int i = 0; i < tasks.size(); i++) {
-                        System.out.println(" " + (i + 1) + "." + tasks.get(i));
-                    }
+                    ui.showTaskList(tasks);
                     break;
                 case UNMARK:
                     String numberText = command.substring(commandType.getKeyword().length()).trim();
                     int taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     tasks.get(taskIndex).markAsNotDone();
                     storage.save(tasks);
-                    System.out.println(" OK, I've marked this task as not done yet:");
-                    System.out.println("   " + tasks.get(taskIndex));
+                    ui.showTaskUnmarked(tasks.get(taskIndex));
                     break;
                 case MARK:
                     numberText = command.substring(commandType.getKeyword().length()).trim();
                     taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     tasks.get(taskIndex).markAsDone();
                     storage.save(tasks);
-                    System.out.println(" Nice! I've marked this task as done:");
-                    System.out.println("   " + tasks.get(taskIndex));
+                    ui.showTaskMarked(tasks.get(taskIndex));
                     break;
                 case DELETE:
                     numberText = command.substring(commandType.getKeyword().length()).trim();
                     taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     Task removedTask = tasks.remove(taskIndex);
                     storage.save(tasks);
-                    System.out.println(" Noted. I've removed this task:");
-                    System.out.println("   " + removedTask);
-                    System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+                    ui.showTaskDeleted(removedTask, tasks.size());
                     break;
                 case TODO:
                     String description = command.substring(commandType.getKeyword().length()).trim();
@@ -102,9 +99,7 @@ public class Snoopy {
                     Task task = new Todo(description);
                     tasks.add(task);
                     storage.save(tasks);
-                    System.out.println(" Got it. I've added this task:");
-                    System.out.println("   " + task);
-                    System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+                    ui.showTaskAdded(task, tasks.size());
                     break;
                 case DEADLINE:
                     int byIndex = command.indexOf(" /by ");
@@ -122,9 +117,7 @@ public class Snoopy {
                     task = new Deadline(description, by);
                     tasks.add(task);
                     storage.save(tasks);
-                    System.out.println(" Got it. I've added this task:");
-                    System.out.println("   " + task);
-                    System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+                    ui.showTaskAdded(task, tasks.size());
                     break;
                 case EVENT:
                     int fromIndex = command.indexOf(" /from ");
@@ -149,9 +142,7 @@ public class Snoopy {
                     task = new Event(description, from, to);
                     tasks.add(task);
                     storage.save(tasks);
-                    System.out.println(" Got it. I've added this task:");
-                    System.out.println("   " + task);
-                    System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+                    ui.showTaskAdded(task, tasks.size());
                     break;
                 case UNKNOWN:
                     throw new SnoopyException(
@@ -159,11 +150,11 @@ public class Snoopy {
                                     + "Try todo, deadline, event, list, mark, unmark, or delete.");
                 }
             } catch (SnoopyException exception) {
-                System.out.println(" OOPS! " + exception.getMessage());
+                ui.showError(exception.getMessage());
             } catch (IOException exception) {
-                System.out.println(" OOPS! I couldn't save the task list.");
+                ui.showSavingError();
             }
-            System.out.println(divider);
+            ui.showLine();
         }
     }
 
