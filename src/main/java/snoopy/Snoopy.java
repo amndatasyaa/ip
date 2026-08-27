@@ -59,42 +59,43 @@ public class Snoopy {
 
             try {
                 switch (commandType) {
-                    case BYE:
+                    case BYE -> {
                         System.out.println(" Bye. Hope to see you again soon!");
                         System.out.println(divider);
                         break chatLoop;
-                    case LIST:
+                    }
+                    case LIST -> {
                         System.out.println(" Here are the tasks in your list:");
                         for (int i = 0; i < tasks.size(); i++) {
                             System.out.println(" " + (i + 1) + "." + tasks.get(i));
                         }
-                        break;
-                    case UNMARK:
+                    }
+                    case UNMARK -> {
                         String numberText = command.substring(commandType.getKeyword().length()).trim();
                         int taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                         tasks.get(taskIndex).markAsNotDone();
                         storage.save(tasks);
                         System.out.println(" OK, I've marked this task as not done yet:");
                         System.out.println("   " + tasks.get(taskIndex));
-                        break;
-                    case MARK:
-                        numberText = command.substring(commandType.getKeyword().length()).trim();
-                        taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
+                    }
+                    case MARK -> {
+                        String numberText = command.substring(commandType.getKeyword().length()).trim();
+                        int taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                         tasks.get(taskIndex).markAsDone();
                         storage.save(tasks);
                         System.out.println(" Nice! I've marked this task as done:");
                         System.out.println("   " + tasks.get(taskIndex));
-                        break;
-                    case DELETE:
-                        numberText = command.substring(commandType.getKeyword().length()).trim();
-                        taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
+                    }
+                    case DELETE -> {
+                        String numberText = command.substring(commandType.getKeyword().length()).trim();
+                        int taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                         Task removedTask = tasks.remove(taskIndex);
                         storage.save(tasks);
                         System.out.println(" Noted. I've removed this task:");
                         System.out.println("   " + removedTask);
                         System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
-                        break;
-                    case FIND:
+                    }
+                    case FIND -> {
                         String keyword = command.substring(commandType.getKeyword().length()).trim();
                         if (keyword.isEmpty()) {
                             throw new SnoopyException("Please provide a keyword to find.");
@@ -107,8 +108,8 @@ public class Snoopy {
                                 matchNumber++;
                             }
                         }
-                        break;
-                    case TODO:
+                    }
+                    case TODO -> {
                         String description = command.substring(commandType.getKeyword().length()).trim();
                         if (description.isEmpty()) {
                             throw new SnoopyException("Please tell me what to add after 'todo'.");
@@ -119,28 +120,29 @@ public class Snoopy {
                         System.out.println(" Got it. I've added this task:");
                         System.out.println("   " + task);
                         System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
-                        break;
-                    case DEADLINE:
+                    }
+                    case DEADLINE -> {
                         int byIndex = command.indexOf(" /by ");
                         if (byIndex < 0) {
                             throw new SnoopyException(
                                     "Please use: deadline <description> /by <date or time>.");
                         }
-                        description = command.substring(commandType.getKeyword().length(), byIndex).trim();
+                        String description = command.substring(
+                                commandType.getKeyword().length(), byIndex).trim();
                         String byText = command.substring(byIndex + 5).trim();
                         if (description.isEmpty() || byText.isEmpty()) {
                             throw new SnoopyException(
                                     "A deadline needs both a description and a '/by' value.");
                         }
                         LocalDate by = parseDate(byText, commandType);
-                        task = new Deadline(description, by);
+                        Task task = new Deadline(description, by);
                         tasks.add(task);
                         storage.save(tasks);
                         System.out.println(" Got it. I've added this task:");
                         System.out.println("   " + task);
                         System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
-                        break;
-                    case EVENT:
+                    }
+                    case EVENT -> {
                         int fromIndex = command.indexOf(" /from ");
                         int toIndex = command.indexOf(" /to ");
                         if (fromIndex < 0 || toIndex < 0 || fromIndex >= toIndex) {
@@ -151,7 +153,8 @@ public class Snoopy {
                             throw new SnoopyException(
                                     "An event needs a description, a '/from' value, and a '/to' value.");
                         }
-                        description = command.substring(commandType.getKeyword().length(), fromIndex).trim();
+                        String description = command.substring(
+                                commandType.getKeyword().length(), fromIndex).trim();
                         String fromText = command.substring(fromIndex + 7, toIndex).trim();
                         String toText = command.substring(toIndex + 5).trim();
                         if (description.isEmpty() || fromText.isEmpty() || toText.isEmpty()) {
@@ -160,17 +163,16 @@ public class Snoopy {
                         }
                         LocalDate from = parseDate(fromText, commandType);
                         LocalDate to = parseDate(toText, commandType);
-                        task = new Event(description, from, to);
+                        Task task = new Event(description, from, to);
                         tasks.add(task);
                         storage.save(tasks);
                         System.out.println(" Got it. I've added this task:");
                         System.out.println("   " + task);
                         System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
-                        break;
-                    case UNKNOWN:
-                        throw new SnoopyException(
-                                "Sorry, I don't recognize that command. "
-                                        + "Try todo, deadline, event, list, mark, unmark, delete, or find.");
+                    }
+                    case UNKNOWN -> throw new SnoopyException(
+                            "Sorry, I don't recognize that command. "
+                                    + "Try todo, deadline, event, list, mark, unmark, delete, or find.");
                 }
             } catch (SnoopyException exception) {
                 System.out.println(" OOPS! " + exception.getMessage());
