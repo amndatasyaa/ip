@@ -9,7 +9,23 @@ import java.util.ArrayList;
  * Saves and loads Snoopy's tasks using a text file on the hard disk.
  */
 public class Storage {
-    private final Path filePath = Path.of("data", "snoopy.txt");
+    private final Path filePath;
+
+    /**
+     * Creates storage that uses Snoopy's standard data-file location.
+     */
+    public Storage() {
+        this(Path.of("data", "snoopy.txt"));
+    }
+
+    /**
+     * Creates storage at a specified path so persistence can be tested in isolation.
+     *
+     * @param filePath location of the data file
+     */
+    Storage(Path filePath) {
+        this.filePath = filePath;
+    }
 
     /**
      * Replaces the data file with the current task list.
