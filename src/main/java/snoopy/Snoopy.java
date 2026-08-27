@@ -21,7 +21,7 @@ public class Snoopy {
     /**
      * Runs the chatbot until the user enters {@code bye}.
      *
-     * @param args command-line arguments; not used by this application
+     * @param args Command-line arguments; not used by this application.
      */
     public static void main(String[] args) {
         String divider = "____________________________________________________________";
@@ -59,17 +59,17 @@ public class Snoopy {
 
             try {
                 switch (commandType) {
-                case BYE:
+                    case BYE:
                     System.out.println(" Bye. Hope to see you again soon!");
                     System.out.println(divider);
                     break chatLoop;
-                case LIST:
+                    case LIST:
                     System.out.println(" Here are the tasks in your list:");
                     for (int i = 0; i < tasks.size(); i++) {
                         System.out.println(" " + (i + 1) + "." + tasks.get(i));
                     }
                     break;
-                case UNMARK:
+                    case UNMARK:
                     String numberText = command.substring(commandType.getKeyword().length()).trim();
                     int taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     tasks.get(taskIndex).markAsNotDone();
@@ -77,7 +77,7 @@ public class Snoopy {
                     System.out.println(" OK, I've marked this task as not done yet:");
                     System.out.println("   " + tasks.get(taskIndex));
                     break;
-                case MARK:
+                    case MARK:
                     numberText = command.substring(commandType.getKeyword().length()).trim();
                     taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     tasks.get(taskIndex).markAsDone();
@@ -85,7 +85,7 @@ public class Snoopy {
                     System.out.println(" Nice! I've marked this task as done:");
                     System.out.println("   " + tasks.get(taskIndex));
                     break;
-                case DELETE:
+                    case DELETE:
                     numberText = command.substring(commandType.getKeyword().length()).trim();
                     taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     Task removedTask = tasks.remove(taskIndex);
@@ -94,7 +94,7 @@ public class Snoopy {
                     System.out.println("   " + removedTask);
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
                     break;
-                case TODO:
+                    case TODO:
                     String description = command.substring(commandType.getKeyword().length()).trim();
                     if (description.isEmpty()) {
                         throw new SnoopyException("Please tell me what to add after 'todo'.");
@@ -106,7 +106,7 @@ public class Snoopy {
                     System.out.println("   " + task);
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
                     break;
-                case DEADLINE:
+                    case DEADLINE:
                     int byIndex = command.indexOf(" /by ");
                     if (byIndex < 0) {
                         throw new SnoopyException(
@@ -126,7 +126,7 @@ public class Snoopy {
                     System.out.println("   " + task);
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
                     break;
-                case EVENT:
+                    case EVENT:
                     int fromIndex = command.indexOf(" /from ");
                     int toIndex = command.indexOf(" /to ");
                     if (fromIndex < 0 || toIndex < 0 || fromIndex >= toIndex) {
@@ -153,7 +153,7 @@ public class Snoopy {
                     System.out.println("   " + task);
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
                     break;
-                case UNKNOWN:
+                    case UNKNOWN:
                     throw new SnoopyException(
                             "Sorry, I don't recognize that command. "
                                     + "Try todo, deadline, event, list, mark, unmark, or delete.");
@@ -170,10 +170,10 @@ public class Snoopy {
     /**
      * Parses an ISO date used by a deadline or event command.
      *
-     * @param dateText date entered by the user
-     * @param commandType command whose date is being parsed
-     * @return parsed date
-     * @throws SnoopyException if the text is not a valid {@code yyyy-MM-dd} date
+     * @param dateText Date entered by the user.
+     * @param commandType Command whose date is being parsed.
+     * @return Parsed date.
+     * @throws SnoopyException If the text is not a valid {@code yyyy-MM-dd} date.
      */
     private static LocalDate parseDate(String dateText, CommandType commandType)
             throws SnoopyException {
@@ -191,11 +191,11 @@ public class Snoopy {
     /**
      * Converts a user-supplied task number into a valid array index.
      *
-     * @param numberText task number entered by the user
-     * @param taskCount number of tasks currently stored
-     * @param commandType command that requires the task number
-     * @return the zero-based index of the selected task
-     * @throws SnoopyException if the number is missing, non-numeric, or outside the list
+     * @param numberText Task number entered by the user.
+     * @param taskCount Number of tasks currently stored.
+     * @param commandType Command that requires the task number.
+     * @return The zero-based index of the selected task.
+     * @throws SnoopyException If the number is missing, non-numeric, or outside the list.
      */
     private static int parseTaskIndex(String numberText, int taskCount, CommandType commandType)
             throws SnoopyException {

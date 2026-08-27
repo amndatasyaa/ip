@@ -7,7 +7,7 @@ public class Todo extends Task {
     /**
      * Creates an incomplete todo task.
      *
-     * @param description text describing the task
+     * @param description Text describing the task.
      */
     public Todo(String description) {
         super(description);
@@ -16,7 +16,7 @@ public class Todo extends Task {
     /**
      * Converts this todo into one line of saved data.
      *
-     * @return saved todo data
+     * @return Saved todo data.
      */
     @Override
     public String toDataString() {
@@ -26,7 +26,7 @@ public class Todo extends Task {
     /**
      * Returns this task with the todo type indicator.
      *
-     * @return the formatted todo task
+     * @return The formatted todo task.
      */
     @Override
     public String toString() {
