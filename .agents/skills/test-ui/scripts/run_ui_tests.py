@@ -16,8 +16,12 @@ from pathlib import Path
 CASE_PATTERN = re.compile(
     r"^## (?P<name>.+?)\n\n"
     r"\*\*Aim:\*\* (?P<aim>.+?)\n\n"
+    r"(?:### Initial data file\n\n```text\n(?P<initial_data>.*?)```\n\n)?"
     r"### Input\n\n```text\n(?P<input>.*?)```\n\n"
-    r"### Expected output\n\n```text\n(?P<expected>.*?)```(?=\n\n## |\n?\Z)",
+    r"### Expected output\n\n```text\n(?P<expected>.*?)```"
+    r"(?:\n\n### Restart input\n\n```text\n(?P<restart_input>.*?)```\n\n"
+    r"### Expected restart output\n\n```text\n(?P<restart_expected>.*?)```)?"
+    r"(?=\n\n## |\n?\Z)",
     re.MULTILINE | re.DOTALL,
 )
 JAVA_25_PATTERN = re.compile(r'(?:version "|javac )25(?:\.|\s|\")')
@@ -31,8 +35,11 @@ class TestCase:
 
     name: str
     aim: str
+    initial_data: str | None
     program_input: str
     expected_output: str
+    restart_input: str | None
+    expected_restart_output: str | None
 
 
 def load_test_cases(plan_path: Path) -> list[TestCase]:
@@ -43,8 +50,11 @@ def load_test_cases(plan_path: Path) -> list[TestCase]:
         TestCase(
             name=match.group("name"),
             aim=match.group("aim"),
+            initial_data=match.group("initial_data"),
             program_input=match.group("input"),
             expected_output=match.group("expected"),
+            restart_input=match.group("restart_input"),
+            expected_restart_output=match.group("restart_expected"),
         )
         for match in CASE_PATTERN.finditer(plan)
     ]
@@ -148,6 +158,13 @@ def main() -> int:
             return 2
 
         for case in cases:
+            case_directory = Path(build_dir) / case.name.split(":", 1)[0].lower()
+            case_directory.mkdir()
+            if case.initial_data is not None:
+                data_file = case_directory / "data/snoopy.txt"
+                data_file.parent.mkdir()
+                data_file.write_text(case.initial_data, encoding="utf-8")
+
             print(f"=== {case.name} ===")
             print(f"Aim: {case.aim}")
             print_transcript("Console input", case.program_input)
@@ -158,7 +175,7 @@ def main() -> int:
                     capture_output=True,
                     text=True,
                     check=False,
-                    cwd=repository_root,
+                    cwd=case_directory,
                     timeout=CASE_TIMEOUT_SECONDS,
                 )
             except subprocess.TimeoutExpired as error:
@@ -176,6 +193,34 @@ def main() -> int:
                 print_transcript("Expected output", case.expected_output)
                 print_transcript("Actual output", actual_output)
                 return 1
+
+            if case.restart_input is not None:
+                print_transcript("Console input after restart", case.restart_input)
+                try:
+                    restart_result = subprocess.run(
+                        [str(java), "-cp", build_dir, "Snoopy"],
+                        input=case.restart_input,
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                        cwd=case_directory,
+                        timeout=CASE_TIMEOUT_SECONDS,
+                    )
+                except subprocess.TimeoutExpired as error:
+                    restart_output = captured_text(error.stdout) + captured_text(error.stderr)
+                    print_transcript("Console output after restart", restart_output)
+                    print(f"FAIL: {case.name} restart exceeded {CASE_TIMEOUT_SECONDS} seconds")
+                    print_transcript("Expected restart output", case.expected_restart_output or "")
+                    print_transcript("Actual restart output", restart_output)
+                    return 1
+                restart_output = restart_result.stdout + restart_result.stderr
+                print_transcript("Console output after restart", restart_output)
+                if (restart_result.returncode != 0
+                        or restart_output != case.expected_restart_output):
+                    print(f"FAIL: {case.name} restart")
+                    print_transcript("Expected restart output", case.expected_restart_output or "")
+                    print_transcript("Actual restart output", restart_output)
+                    return 1
             print(f"PASS: {case.name}\n")
 
     print(f"All {len(cases)} UI test case(s) passed.")
