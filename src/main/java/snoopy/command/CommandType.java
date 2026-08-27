@@ -34,27 +34,4 @@ public enum CommandType {
         return keyword;
     }
 
-    /**
-     * Identifies a command from the first word of the user's input.
-     *
-     * @param command complete trimmed input from the user
-     * @return matching command type, or {@link #UNKNOWN} when no command matches
-     */
-    public static CommandType fromCommand(String command) {
-        if (command.isEmpty()) {
-            return UNKNOWN;
-        }
-
-        String firstWord = command.split("\\s+", 2)[0];
-        for (CommandType type : values()) {
-            if (type.keyword.equals(firstWord)) {
-                boolean acceptsArguments = type != BYE && type != LIST;
-                if (!acceptsArguments && !command.equals(type.keyword)) {
-                    return UNKNOWN;
-                }
-                return type;
-            }
-        }
-        return UNKNOWN;
-    }
 }
