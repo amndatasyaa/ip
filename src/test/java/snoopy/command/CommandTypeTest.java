@@ -15,6 +15,7 @@ public class CommandTypeTest {
         assertEquals(CommandType.MARK, CommandType.fromCommand("mark 2"));
         assertEquals(CommandType.UNMARK, CommandType.fromCommand("unmark 2"));
         assertEquals(CommandType.DELETE, CommandType.fromCommand("delete 2"));
+        assertEquals(CommandType.FIND, CommandType.fromCommand("find book"));
         assertEquals(CommandType.TODO, CommandType.fromCommand("todo read book"));
         assertEquals(CommandType.DEADLINE,
                 CommandType.fromCommand("deadline return book /by 2026-08-30"));
@@ -25,6 +26,7 @@ public class CommandTypeTest {
     @Test
     public void fromCommand_argumentCommandWithoutArguments_returnsMatchingType() {
         assertEquals(CommandType.MARK, CommandType.fromCommand("mark"));
+        assertEquals(CommandType.FIND, CommandType.fromCommand("find"));
         assertEquals(CommandType.TODO, CommandType.fromCommand("todo"));
         assertEquals(CommandType.DEADLINE, CommandType.fromCommand("deadline"));
     }

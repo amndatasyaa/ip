@@ -94,6 +94,20 @@ public class Snoopy {
                     System.out.println("   " + removedTask);
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
                     break;
+                case FIND:
+                    String keyword = command.substring(commandType.getKeyword().length()).trim();
+                    if (keyword.isEmpty()) {
+                        throw new SnoopyException("Please provide a keyword to find.");
+                    }
+                    System.out.println(" Here are the matching tasks in your list:");
+                    int matchNumber = 1;
+                    for (Task currentTask : tasks) {
+                        if (currentTask.containsKeyword(keyword)) {
+                            System.out.println(" " + matchNumber + "." + currentTask);
+                            matchNumber++;
+                        }
+                    }
+                    break;
                 case TODO:
                     String description = command.substring(commandType.getKeyword().length()).trim();
                     if (description.isEmpty()) {
@@ -156,7 +170,7 @@ public class Snoopy {
                 case UNKNOWN:
                     throw new SnoopyException(
                             "Sorry, I don't recognize that command. "
-                                    + "Try todo, deadline, event, list, mark, unmark, or delete.");
+                                    + "Try todo, deadline, event, list, mark, unmark, delete, or find.");
                 }
             } catch (SnoopyException exception) {
                 System.out.println(" OOPS! " + exception.getMessage());
