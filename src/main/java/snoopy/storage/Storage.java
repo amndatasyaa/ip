@@ -1,9 +1,17 @@
+package snoopy.storage;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+
+import snoopy.exception.SnoopyException;
+import snoopy.task.Deadline;
+import snoopy.task.Event;
+import snoopy.task.Task;
+import snoopy.task.Todo;
 
 /**
  * Saves and loads Snoopy's tasks using a text file on the hard disk.

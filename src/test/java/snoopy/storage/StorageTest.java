@@ -1,3 +1,5 @@
+package snoopy.storage;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -10,6 +12,12 @@ import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+
+import snoopy.exception.SnoopyException;
+import snoopy.task.Deadline;
+import snoopy.task.Event;
+import snoopy.task.Task;
+import snoopy.task.Todo;
 
 /**
  * Tests saving, loading, and validation of persisted tasks.

@@ -1,8 +1,18 @@
+package snoopy;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import snoopy.command.CommandType;
+import snoopy.exception.SnoopyException;
+import snoopy.storage.Storage;
+import snoopy.task.Deadline;
+import snoopy.task.Event;
+import snoopy.task.Task;
+import snoopy.task.Todo;
 
 /**
  * Starts the Snoopy chatbot application.
