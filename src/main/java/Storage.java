@@ -1,6 +1,8 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 /**
@@ -70,14 +72,14 @@ public class Storage {
             if (fields.length != 4 || fields[2].isBlank() || fields[3].isBlank()) {
                 throw corruptedFileException(lineNumber);
             }
-            task = new Deadline(fields[2], fields[3]);
+            task = createDeadline(fields, lineNumber);
             break;
         case "E":
             if (fields.length != 5 || fields[2].isBlank()
                     || fields[3].isBlank() || fields[4].isBlank()) {
                 throw corruptedFileException(lineNumber);
             }
-            task = new Event(fields[2], fields[3], fields[4]);
+            task = createEvent(fields, lineNumber);
             break;
         default:
             throw corruptedFileException(lineNumber);
@@ -87,6 +89,38 @@ public class Storage {
             task.markAsDone();
         }
         return task;
+    }
+
+    /**
+     * Reconstructs a deadline and validates its saved ISO date.
+     *
+     * @param fields fields from one saved deadline
+     * @param lineNumber one-based location of the saved record
+     * @return reconstructed deadline
+     * @throws SnoopyException if the saved date is invalid
+     */
+    private Deadline createDeadline(String[] fields, int lineNumber) throws SnoopyException {
+        try {
+            return new Deadline(fields[2], LocalDate.parse(fields[3]));
+        } catch (DateTimeParseException exception) {
+            throw corruptedFileException(lineNumber);
+        }
+    }
+
+    /**
+     * Reconstructs an event and validates its saved ISO dates.
+     *
+     * @param fields fields from one saved event
+     * @param lineNumber one-based location of the saved record
+     * @return reconstructed event
+     * @throws SnoopyException if either saved date is invalid
+     */
+    private Event createEvent(String[] fields, int lineNumber) throws SnoopyException {
+        try {
+            return new Event(fields[2], LocalDate.parse(fields[3]), LocalDate.parse(fields[4]));
+        } catch (DateTimeParseException exception) {
+            throw corruptedFileException(lineNumber);
+        }
     }
 
     /**

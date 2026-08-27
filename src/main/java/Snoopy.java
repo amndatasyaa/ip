@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -101,11 +103,12 @@ public class Snoopy {
                                 "Please use: deadline <description> /by <date or time>.");
                     }
                     description = command.substring(commandType.getKeyword().length(), byIndex).trim();
-                    String by = command.substring(byIndex + 5).trim();
-                    if (description.isEmpty() || by.isEmpty()) {
+                    String byText = command.substring(byIndex + 5).trim();
+                    if (description.isEmpty() || byText.isEmpty()) {
                         throw new SnoopyException(
                                 "A deadline needs both a description and a '/by' value.");
                     }
+                    LocalDate by = parseDate(byText, commandType);
                     task = new Deadline(description, by);
                     tasks.add(task);
                     storage.save(tasks);
@@ -125,12 +128,14 @@ public class Snoopy {
                                 "An event needs a description, a '/from' value, and a '/to' value.");
                     }
                     description = command.substring(commandType.getKeyword().length(), fromIndex).trim();
-                    String from = command.substring(fromIndex + 7, toIndex).trim();
-                    String to = command.substring(toIndex + 5).trim();
-                    if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
+                    String fromText = command.substring(fromIndex + 7, toIndex).trim();
+                    String toText = command.substring(toIndex + 5).trim();
+                    if (description.isEmpty() || fromText.isEmpty() || toText.isEmpty()) {
                         throw new SnoopyException(
                                 "An event needs a description, a '/from' value, and a '/to' value.");
                     }
+                    LocalDate from = parseDate(fromText, commandType);
+                    LocalDate to = parseDate(toText, commandType);
                     task = new Event(description, from, to);
                     tasks.add(task);
                     storage.save(tasks);
@@ -149,6 +154,27 @@ public class Snoopy {
                 System.out.println(" OOPS! I couldn't save the task list.");
             }
             System.out.println(divider);
+        }
+    }
+
+    /**
+     * Parses an ISO date used by a deadline or event command.
+     *
+     * @param dateText date entered by the user
+     * @param commandType command whose date is being parsed
+     * @return parsed date
+     * @throws SnoopyException if the text is not a valid {@code yyyy-MM-dd} date
+     */
+    private static LocalDate parseDate(String dateText, CommandType commandType)
+            throws SnoopyException {
+        try {
+            return LocalDate.parse(dateText);
+        } catch (DateTimeParseException exception) {
+            String subject = commandType == CommandType.DEADLINE
+                    ? "the deadline date" : "event dates";
+            throw new SnoopyException(
+                    "Please enter " + subject
+                            + " as yyyy-MM-dd, for example 2019-10-15.");
         }
     }
 
