@@ -50,6 +50,140 @@ ____________________________________________________________
 ____________________________________________________________
 ```
 
+## UI-12: Save all mutations and load the final state after restart
+
+**Aim:** Verify that additions, mark, unmark, and deletion are persisted with the correct task types, order, details, and completion states.
+
+### Input
+
+```text
+todo remove me
+deadline return book /by Friday
+event project meeting /from Mon /to Tue
+mark 2
+mark 3
+unmark 3
+delete 1
+bye
+```
+
+### Expected output
+
+```text
+____________________________________________________________
+  ____
+ / ___| _ __   ___   ___  _ __  _   _
+ \___ \| '_ \ / _ \ / _ \| '_ \| | | |
+  ___) | | | | (_) | (_) | |_) | |_| |
+ |____/|_| |_|\___/ \___/| .__/ \__, |
+                            |_|    |___/
+Hi! I'm Snoopy, your happy little helper.
+What can I do for you?
+____________________________________________________________
+ Got it. I've added this task:
+   [T][ ] remove me
+ Now you have 1 tasks in the list.
+____________________________________________________________
+ Got it. I've added this task:
+   [D][ ] return book (by: Friday)
+ Now you have 2 tasks in the list.
+____________________________________________________________
+ Got it. I've added this task:
+   [E][ ] project meeting (from: Mon to: Tue)
+ Now you have 3 tasks in the list.
+____________________________________________________________
+ Nice! I've marked this task as done:
+   [D][X] return book (by: Friday)
+____________________________________________________________
+ Nice! I've marked this task as done:
+   [E][X] project meeting (from: Mon to: Tue)
+____________________________________________________________
+ OK, I've marked this task as not done yet:
+   [E][ ] project meeting (from: Mon to: Tue)
+____________________________________________________________
+ Noted. I've removed this task:
+   [T][ ] remove me
+ Now you have 2 tasks in the list.
+____________________________________________________________
+ Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+### Restart input
+
+```text
+list
+bye
+```
+
+### Expected restart output
+
+```text
+____________________________________________________________
+  ____
+ / ___| _ __   ___   ___  _ __  _   _
+ \___ \| '_ \ / _ \ / _ \| '_ \| | | |
+  ___) | | | | (_) | (_) | |_) | |_| |
+ |____/|_| |_|\___/ \___/| .__/ \__, |
+                            |_|    |___/
+Hi! I'm Snoopy, your happy little helper.
+What can I do for you?
+____________________________________________________________
+ Here are the tasks in your list:
+ 1.[D][X] return book (by: Friday)
+ 2.[E][ ] project meeting (from: Mon to: Tue)
+____________________________________________________________
+ Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## UI-13: Handle a corrupted data file without crashing
+
+**Aim:** Verify that malformed saved data produces a clear error, starts with a safe empty list, and still accepts subsequent commands.
+
+### Initial data file
+
+```text
+this is not a valid saved task
+```
+
+### Input
+
+```text
+list
+todo replacement
+list
+bye
+```
+
+### Expected output
+
+```text
+____________________________________________________________
+  ____
+ / ___| _ __   ___   ___  _ __  _   _
+ \___ \| '_ \ / _ \ / _ \| '_ \| | | |
+  ___) | | | | (_) | (_) | |_) | |_| |
+ |____/|_| |_|\___/ \___/| .__/ \__, |
+                            |_|    |___/
+Hi! I'm Snoopy, your happy little helper.
+What can I do for you?
+____________________________________________________________
+ OOPS! The data file is corrupted at line 1.
+____________________________________________________________
+ Here are the tasks in your list:
+____________________________________________________________
+ Got it. I've added this task:
+   [T][ ] replacement
+ Now you have 1 tasks in the list.
+____________________________________________________________
+ Here are the tasks in your list:
+ 1.[T][ ] replacement
+____________________________________________________________
+ Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
 ## UI-02: Mark and unmark a task
 
 **Aim:** Verify that a task's done status can be set and then reversed without changing its description or type.

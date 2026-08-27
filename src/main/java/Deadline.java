@@ -16,6 +16,16 @@ public class Deadline extends Task {
     }
 
     /**
+     * Converts this deadline into one line of saved data.
+     *
+     * @return saved deadline data
+     */
+    @Override
+    public String toDataString() {
+        return "D | " + super.toDataString() + " | " + this.by;
+    }
+
+    /**
      * Returns this task with its type and deadline.
      *
      * @return the formatted deadline task

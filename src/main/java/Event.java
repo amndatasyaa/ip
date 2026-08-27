@@ -19,6 +19,16 @@ public class Event extends Task {
     }
 
     /**
+     * Converts this event into one line of saved data.
+     *
+     * @return saved event data
+     */
+    @Override
+    public String toDataString() {
+        return "E | " + super.toDataString() + " | " + this.from + " | " + this.to;
+    }
+
+    /**
      * Returns this task with its type, start time, and end time.
      *
      * @return the formatted event task

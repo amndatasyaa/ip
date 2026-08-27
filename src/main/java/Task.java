@@ -39,6 +39,21 @@ public class Task {
     }
 
     /**
+     * Converts the task's common fields into the format used in the data file.
+     *
+     * @return completion status and description separated by {@code |}
+     */
+    public String toDataString() {
+        String status;
+        if (this.isDone) {
+            status = "1";
+        } else {
+            status = "0";
+        }
+        return status + " | " + this.description;
+    }
+
+    /**
      * Returns this task in the format shown by the chatbot.
      *
      * @return the status icon followed by the task description
