@@ -36,6 +36,11 @@ After every code update:
 2. Invoke the project-specific `test-ui` skill and run its complete UI test plan.
 3. If a test fails, stop the test session immediately and report the actual and expected outputs as directed by the skill.
 
+## JUnit testing
+
+* Maintain JUnit tests for at least the top 50% highest-value methods, prioritizing complex, core, and critical business logic.
+* After each code change, update the JUnit tests as needed to keep that coverage target and run the complete JUnit test suite.
+
 ## Git
 
 Use lightweight tags unless the user requests an annotated tag.

@@ -1,3 +1,5 @@
+package snoopy.command;
+
 /**
  * Represents the commands understood by Snoopy.
  */

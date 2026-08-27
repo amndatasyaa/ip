@@ -1,3 +1,5 @@
+package snoopy.exception;
+
 /**
  * Represents an input error that Snoopy can explain to the user.
  */

@@ -170,7 +170,7 @@ def main() -> int:
             print_transcript("Console input", case.program_input)
             try:
                 result = subprocess.run(
-                    [str(java), "-cp", build_dir, "Snoopy"],
+                    [str(java), "-cp", build_dir, "snoopy.Snoopy"],
                     input=case.program_input,
                     capture_output=True,
                     text=True,
@@ -198,7 +198,7 @@ def main() -> int:
                 print_transcript("Console input after restart", case.restart_input)
                 try:
                     restart_result = subprocess.run(
-                        [str(java), "-cp", build_dir, "Snoopy"],
+                        [str(java), "-cp", build_dir, "snoopy.Snoopy"],
                         input=case.restart_input,
                         capture_output=True,
                         text=True,
