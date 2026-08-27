@@ -10,8 +10,8 @@ The tests compare the complete console output exactly, including whitespace and 
 
 ```text
 todo borrow book
-deadline return book /by Sunday
-event project meeting /from Mon 2pm /to 4pm
+deadline return book /by 2026-08-30
+event project meeting /from 2026-09-01 /to 2026-09-02
 list
 bye
 ```
@@ -34,17 +34,17 @@ ____________________________________________________________
  Now you have 1 tasks in the list.
 ____________________________________________________________
  Got it. I've added this task:
-   [D][ ] return book (by: Sunday)
+   [D][ ] return book (by: Aug 30 2026)
  Now you have 2 tasks in the list.
 ____________________________________________________________
  Got it. I've added this task:
-   [E][ ] project meeting (from: Mon 2pm to: 4pm)
+   [E][ ] project meeting (from: Sep 01 2026 to: Sep 02 2026)
  Now you have 3 tasks in the list.
 ____________________________________________________________
  Here are the tasks in your list:
  1.[T][ ] borrow book
- 2.[D][ ] return book (by: Sunday)
- 3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+ 2.[D][ ] return book (by: Aug 30 2026)
+ 3.[E][ ] project meeting (from: Sep 01 2026 to: Sep 02 2026)
 ____________________________________________________________
  Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -58,8 +58,8 @@ ____________________________________________________________
 
 ```text
 todo remove me
-deadline return book /by Friday
-event project meeting /from Mon /to Tue
+deadline return book /by 2026-08-29
+event project meeting /from 2026-09-01 /to 2026-09-02
 mark 2
 mark 3
 unmark 3
@@ -85,21 +85,21 @@ ____________________________________________________________
  Now you have 1 tasks in the list.
 ____________________________________________________________
  Got it. I've added this task:
-   [D][ ] return book (by: Friday)
+   [D][ ] return book (by: Aug 29 2026)
  Now you have 2 tasks in the list.
 ____________________________________________________________
  Got it. I've added this task:
-   [E][ ] project meeting (from: Mon to: Tue)
+   [E][ ] project meeting (from: Sep 01 2026 to: Sep 02 2026)
  Now you have 3 tasks in the list.
 ____________________________________________________________
  Nice! I've marked this task as done:
-   [D][X] return book (by: Friday)
+   [D][X] return book (by: Aug 29 2026)
 ____________________________________________________________
  Nice! I've marked this task as done:
-   [E][X] project meeting (from: Mon to: Tue)
+   [E][X] project meeting (from: Sep 01 2026 to: Sep 02 2026)
 ____________________________________________________________
  OK, I've marked this task as not done yet:
-   [E][ ] project meeting (from: Mon to: Tue)
+   [E][ ] project meeting (from: Sep 01 2026 to: Sep 02 2026)
 ____________________________________________________________
  Noted. I've removed this task:
    [T][ ] remove me
@@ -130,8 +130,8 @@ Hi! I'm Snoopy, your happy little helper.
 What can I do for you?
 ____________________________________________________________
  Here are the tasks in your list:
- 1.[D][X] return book (by: Friday)
- 2.[E][ ] project meeting (from: Mon to: Tue)
+ 1.[D][X] return book (by: Aug 29 2026)
+ 2.[E][ ] project meeting (from: Sep 01 2026 to: Sep 02 2026)
 ____________________________________________________________
  Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -144,7 +144,7 @@ ____________________________________________________________
 ### Initial data file
 
 ```text
-this is not a valid saved task
+D | 0 | impossible saved deadline | 2026-02-30
 ```
 
 ### Input
@@ -179,6 +179,66 @@ ____________________________________________________________
 ____________________________________________________________
  Here are the tasks in your list:
  1.[T][ ] replacement
+____________________________________________________________
+ Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## UI-14: Parse valid dates and reject invalid dates without changing state
+
+**Aim:** Verify that ISO dates become formatted date objects while malformed and impossible dates are rejected without adding tasks.
+
+### Input
+
+```text
+todo anchor
+deadline bad format /by Friday
+deadline impossible /by 2026-02-30
+event bad start /from Monday /to 2026-09-02
+event bad end /from 2026-09-01 /to Tuesday
+deadline valid deadline /by 2019-10-15
+event valid event /from 2019-10-15 /to 2019-10-16
+list
+bye
+```
+
+### Expected output
+
+```text
+____________________________________________________________
+  ____
+ / ___| _ __   ___   ___  _ __  _   _
+ \___ \| '_ \ / _ \ / _ \| '_ \| | | |
+  ___) | | | | (_) | (_) | |_) | |_| |
+ |____/|_| |_|\___/ \___/| .__/ \__, |
+                            |_|    |___/
+Hi! I'm Snoopy, your happy little helper.
+What can I do for you?
+____________________________________________________________
+ Got it. I've added this task:
+   [T][ ] anchor
+ Now you have 1 tasks in the list.
+____________________________________________________________
+ OOPS! Please enter the deadline date as yyyy-MM-dd, for example 2019-10-15.
+____________________________________________________________
+ OOPS! Please enter the deadline date as yyyy-MM-dd, for example 2019-10-15.
+____________________________________________________________
+ OOPS! Please enter event dates as yyyy-MM-dd, for example 2019-10-15.
+____________________________________________________________
+ OOPS! Please enter event dates as yyyy-MM-dd, for example 2019-10-15.
+____________________________________________________________
+ Got it. I've added this task:
+   [D][ ] valid deadline (by: Oct 15 2019)
+ Now you have 2 tasks in the list.
+____________________________________________________________
+ Got it. I've added this task:
+   [E][ ] valid event (from: Oct 15 2019 to: Oct 16 2019)
+ Now you have 3 tasks in the list.
+____________________________________________________________
+ Here are the tasks in your list:
+ 1.[T][ ] anchor
+ 2.[D][ ] valid deadline (by: Oct 15 2019)
+ 3.[E][ ] valid event (from: Oct 15 2019 to: Oct 16 2019)
 ____________________________________________________________
  Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -325,12 +385,12 @@ ____________________________________________________________
 
 ```text
 todo alpha
-deadline beta /by Friday
+deadline beta /by 2026-08-29
 todo
 deadline gamma
 event delta /from Monday
 event meeting /to Tue /from Mon
-event meeting /from Mon /to Tue
+event meeting /from 2026-09-01 /to 2026-09-02
 list
 deadline /by Sunday
 todo epsilon
@@ -356,7 +416,7 @@ ____________________________________________________________
  Now you have 1 tasks in the list.
 ____________________________________________________________
  Got it. I've added this task:
-   [D][ ] beta (by: Friday)
+   [D][ ] beta (by: Aug 29 2026)
  Now you have 2 tasks in the list.
 ____________________________________________________________
  OOPS! Please tell me what to add after 'todo'.
@@ -368,13 +428,13 @@ ____________________________________________________________
  OOPS! Please use: event <description> /from <start> /to <end>.
 ____________________________________________________________
  Got it. I've added this task:
-   [E][ ] meeting (from: Mon to: Tue)
+   [E][ ] meeting (from: Sep 01 2026 to: Sep 02 2026)
  Now you have 3 tasks in the list.
 ____________________________________________________________
  Here are the tasks in your list:
  1.[T][ ] alpha
- 2.[D][ ] beta (by: Friday)
- 3.[E][ ] meeting (from: Mon to: Tue)
+ 2.[D][ ] beta (by: Aug 29 2026)
+ 3.[E][ ] meeting (from: Sep 01 2026 to: Sep 02 2026)
 ____________________________________________________________
  OOPS! A deadline needs both a description and a '/by' value.
 ____________________________________________________________
@@ -384,8 +444,8 @@ ____________________________________________________________
 ____________________________________________________________
  Here are the tasks in your list:
  1.[T][ ] alpha
- 2.[D][ ] beta (by: Friday)
- 3.[E][ ] meeting (from: Mon to: Tue)
+ 2.[D][ ] beta (by: Aug 29 2026)
+ 3.[E][ ] meeting (from: Sep 01 2026 to: Sep 02 2026)
  4.[T][ ] epsilon
 ____________________________________________________________
  Bye. Hope to see you again soon!
@@ -529,8 +589,8 @@ ____________________________________________________________
 
 ```text
 todo first
-deadline second /by Friday
-event third /from Mon /to Tue
+deadline second /by 2026-08-29
+event third /from 2026-09-01 /to 2026-09-02
 mark 3
 delete 2
 delete 3
@@ -561,38 +621,38 @@ ____________________________________________________________
  Now you have 1 tasks in the list.
 ____________________________________________________________
  Got it. I've added this task:
-   [D][ ] second (by: Friday)
+   [D][ ] second (by: Aug 29 2026)
  Now you have 2 tasks in the list.
 ____________________________________________________________
  Got it. I've added this task:
-   [E][ ] third (from: Mon to: Tue)
+   [E][ ] third (from: Sep 01 2026 to: Sep 02 2026)
  Now you have 3 tasks in the list.
 ____________________________________________________________
  Nice! I've marked this task as done:
-   [E][X] third (from: Mon to: Tue)
+   [E][X] third (from: Sep 01 2026 to: Sep 02 2026)
 ____________________________________________________________
  Noted. I've removed this task:
-   [D][ ] second (by: Friday)
+   [D][ ] second (by: Aug 29 2026)
  Now you have 2 tasks in the list.
 ____________________________________________________________
  OOPS! Task 3 does not exist. Choose a number from 1 to 2.
 ____________________________________________________________
  Here are the tasks in your list:
  1.[T][ ] first
- 2.[E][X] third (from: Mon to: Tue)
+ 2.[E][X] third (from: Sep 01 2026 to: Sep 02 2026)
 ____________________________________________________________
  OK, I've marked this task as not done yet:
-   [E][ ] third (from: Mon to: Tue)
+   [E][ ] third (from: Sep 01 2026 to: Sep 02 2026)
 ____________________________________________________________
  Noted. I've removed this task:
    [T][ ] first
  Now you have 1 tasks in the list.
 ____________________________________________________________
  Here are the tasks in your list:
- 1.[E][ ] third (from: Mon to: Tue)
+ 1.[E][ ] third (from: Sep 01 2026 to: Sep 02 2026)
 ____________________________________________________________
  Noted. I've removed this task:
-   [E][ ] third (from: Mon to: Tue)
+   [E][ ] third (from: Sep 01 2026 to: Sep 02 2026)
  Now you have 0 tasks in the list.
 ____________________________________________________________
  Here are the tasks in your list:
