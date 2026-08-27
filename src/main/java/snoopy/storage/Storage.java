@@ -29,7 +29,7 @@ public class Storage {
     /**
      * Creates storage at a specified path so persistence can be tested in isolation.
      *
-     * @param filePath location of the data file
+     * @param filePath Location of the data file.
      */
     Storage(Path filePath) {
         this.filePath = filePath;
@@ -38,8 +38,8 @@ public class Storage {
     /**
      * Replaces the data file with the current task list.
      *
-     * @param tasks current tasks to save
-     * @throws IOException if the folder or file cannot be written
+     * @param tasks Current tasks to save.
+     * @throws IOException If the folder or file cannot be written.
      */
     public void save(ArrayList<Task> tasks) throws IOException {
         ArrayList<String> lines = new ArrayList<>();
@@ -53,9 +53,9 @@ public class Storage {
     /**
      * Loads all tasks from the data file, or returns an empty list on first use.
      *
-     * @return tasks reconstructed from the data file
-     * @throws IOException if an existing data file cannot be read
-     * @throws SnoopyException if a saved line does not follow the expected format
+     * @return Tasks reconstructed from the data file.
+     * @throws IOException If an existing data file cannot be read.
+     * @throws SnoopyException If a saved line does not follow the expected format.
      */
     public ArrayList<Task> load() throws IOException, SnoopyException {
         ArrayList<Task> tasks = new ArrayList<>();
@@ -73,10 +73,10 @@ public class Storage {
     /**
      * Reconstructs one task from a line in the data file.
      *
-     * @param line saved task data
-     * @param lineNumber one-based line number used in corruption messages
-     * @return reconstructed task
-     * @throws SnoopyException if the saved data is malformed
+     * @param line Saved task data.
+     * @param lineNumber One-based line number used in corruption messages.
+     * @return Reconstructed task.
+     * @throws SnoopyException If the saved data is malformed.
      */
     private Task parseTask(String line, int lineNumber) throws SnoopyException {
         String[] fields = line.split(" \\| ", -1);
@@ -86,26 +86,26 @@ public class Storage {
 
         Task task;
         switch (fields[0]) {
-        case "T":
+            case "T":
             if (fields.length != 3 || fields[2].isBlank()) {
                 throw corruptedFileException(lineNumber);
             }
             task = new Todo(fields[2]);
             break;
-        case "D":
+            case "D":
             if (fields.length != 4 || fields[2].isBlank() || fields[3].isBlank()) {
                 throw corruptedFileException(lineNumber);
             }
             task = createDeadline(fields, lineNumber);
             break;
-        case "E":
+            case "E":
             if (fields.length != 5 || fields[2].isBlank()
                     || fields[3].isBlank() || fields[4].isBlank()) {
                 throw corruptedFileException(lineNumber);
             }
             task = createEvent(fields, lineNumber);
             break;
-        default:
+            default:
             throw corruptedFileException(lineNumber);
         }
 
@@ -118,10 +118,10 @@ public class Storage {
     /**
      * Reconstructs a deadline and validates its saved ISO date.
      *
-     * @param fields fields from one saved deadline
-     * @param lineNumber one-based location of the saved record
-     * @return reconstructed deadline
-     * @throws SnoopyException if the saved date is invalid
+     * @param fields Fields from one saved deadline.
+     * @param lineNumber One-based location of the saved record.
+     * @return Reconstructed deadline.
+     * @throws SnoopyException If the saved date is invalid.
      */
     private Deadline createDeadline(String[] fields, int lineNumber) throws SnoopyException {
         try {
@@ -134,10 +134,10 @@ public class Storage {
     /**
      * Reconstructs an event and validates its saved ISO dates.
      *
-     * @param fields fields from one saved event
-     * @param lineNumber one-based location of the saved record
-     * @return reconstructed event
-     * @throws SnoopyException if either saved date is invalid
+     * @param fields Fields from one saved event.
+     * @param lineNumber One-based location of the saved record.
+     * @return Reconstructed event.
+     * @throws SnoopyException If either saved date is invalid.
      */
     private Event createEvent(String[] fields, int lineNumber) throws SnoopyException {
         try {
@@ -150,8 +150,8 @@ public class Storage {
     /**
      * Creates a consistent error for malformed saved data.
      *
-     * @param lineNumber one-based location of the malformed record
-     * @return exception describing the corrupted line
+     * @param lineNumber One-based location of the malformed record.
+     * @return Exception describing the corrupted line.
      */
     private SnoopyException corruptedFileException(int lineNumber) {
         return new SnoopyException("The data file is corrupted at line " + lineNumber + ".");

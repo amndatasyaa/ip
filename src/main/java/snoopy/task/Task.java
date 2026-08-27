@@ -4,13 +4,13 @@ package snoopy.task;
  * Represents a task and whether it has been completed.
  */
 public class Task {
-    protected String description;
-    protected boolean isDone;
+    private final String description;
+    private boolean isDone;
 
     /**
      * Creates an incomplete task with the given description.
      *
-     * @param description text describing the task
+     * @param description Text describing the task.
      */
     public Task(String description) {
         this.description = description;
@@ -34,7 +34,7 @@ public class Task {
     /**
      * Returns the symbol used to display this task's completion state.
      *
-     * @return {@code X} when completed, or a space otherwise
+     * @return {@code X} when completed, or a space otherwise.
      */
     public String getStatusIcon() {
         return isDone ? "X" : " ";
@@ -43,7 +43,7 @@ public class Task {
     /**
      * Converts the task's common fields into the format used in the data file.
      *
-     * @return completion status and description separated by {@code |}
+     * @return Completion status and description separated by {@code |}.
      */
     public String toDataString() {
         String status;
@@ -58,7 +58,7 @@ public class Task {
     /**
      * Returns this task in the format shown by the chatbot.
      *
-     * @return the status icon followed by the task description
+     * @return The status icon followed by the task description.
      */
     @Override
     public String toString() {
