@@ -17,7 +17,7 @@ public class Storage {
      * @param tasks current tasks to save
      * @throws IOException if the folder or file cannot be written
      */
-    public void save(ArrayList<Task> tasks) throws IOException {
+    public void save(TaskList tasks) throws IOException {
         ArrayList<String> lines = new ArrayList<>();
         for (Task task : tasks) {
             lines.add(task.toDataString());

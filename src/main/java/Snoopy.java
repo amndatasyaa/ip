@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -29,15 +28,15 @@ public class Snoopy {
         System.out.println(divider);
 
         Storage storage = new Storage();
-        ArrayList<Task> tasks;
+        TaskList tasks;
         try {
-            tasks = storage.load();
+            tasks = new TaskList(storage.load());
         } catch (SnoopyException exception) {
-            tasks = new ArrayList<>();
+            tasks = new TaskList();
             System.out.println(" OOPS! " + exception.getMessage());
             System.out.println(divider);
         } catch (IOException exception) {
-            tasks = new ArrayList<>();
+            tasks = new TaskList();
             System.out.println(" OOPS! I couldn't load the saved tasks.");
             System.out.println(divider);
         }
