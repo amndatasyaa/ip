@@ -315,7 +315,7 @@ What can I do for you?
 ____________________________________________________________
  OOPS! Please tell me what to add after 'todo'.
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.
+ OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, delete, or find.
 ____________________________________________________________
  Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -556,7 +556,7 @@ ____________________________________________________________
 Hi! I'm Snoopy, your happy little helper.
 What can I do for you?
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.
+ OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, delete, or find.
 ____________________________________________________________
  Got it. I've added this task:
    [T][ ] spaced task
@@ -568,14 +568,87 @@ ____________________________________________________________
 ____________________________________________________________
  OOPS! '1 extra' is not a valid task number.
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.
+ OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, delete, or find.
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.
+ OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, delete, or find.
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.
+ OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, delete, or find.
 ____________________________________________________________
  Here are the tasks in your list:
  1.[T][ ] spaced task
+____________________________________________________________
+ Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## UI-15: Find tasks without changing the task list
+
+**Aim:** Verify that find matches case-sensitive description substrings across task types, renumbers matches, ignores formatted dates, and rejects an empty keyword without changing task state.
+
+### Input
+
+```text
+todo read book
+deadline return book /by 2026-08-30
+event book club /from 2026-09-01 /to 2026-09-02
+todo call Alice
+mark 2
+find book
+find Aug 30
+find Book
+find
+list
+bye
+```
+
+### Expected output
+
+```text
+____________________________________________________________
+  ____
+ / ___| _ __   ___   ___  _ __  _   _
+ \___ \| '_ \ / _ \ / _ \| '_ \| | | |
+  ___) | | | | (_) | (_) | |_) | |_| |
+ |____/|_| |_|\___/ \___/| .__/ \__, |
+                            |_|    |___/
+Hi! I'm Snoopy, your happy little helper.
+What can I do for you?
+____________________________________________________________
+ Got it. I've added this task:
+   [T][ ] read book
+ Now you have 1 tasks in the list.
+____________________________________________________________
+ Got it. I've added this task:
+   [D][ ] return book (by: Aug 30 2026)
+ Now you have 2 tasks in the list.
+____________________________________________________________
+ Got it. I've added this task:
+   [E][ ] book club (from: Sep 01 2026 to: Sep 02 2026)
+ Now you have 3 tasks in the list.
+____________________________________________________________
+ Got it. I've added this task:
+   [T][ ] call Alice
+ Now you have 4 tasks in the list.
+____________________________________________________________
+ Nice! I've marked this task as done:
+   [D][X] return book (by: Aug 30 2026)
+____________________________________________________________
+ Here are the matching tasks in your list:
+ 1.[T][ ] read book
+ 2.[D][X] return book (by: Aug 30 2026)
+ 3.[E][ ] book club (from: Sep 01 2026 to: Sep 02 2026)
+____________________________________________________________
+ Here are the matching tasks in your list:
+____________________________________________________________
+ Here are the matching tasks in your list:
+____________________________________________________________
+ OOPS! Please provide a keyword to find.
+____________________________________________________________
+ Here are the tasks in your list:
+ 1.[T][ ] read book
+ 2.[D][X] return book (by: Aug 30 2026)
+ 3.[E][ ] book club (from: Sep 01 2026 to: Sep 02 2026)
+ 4.[T][ ] call Alice
 ____________________________________________________________
  Bye. Hope to see you again soon!
 ____________________________________________________________

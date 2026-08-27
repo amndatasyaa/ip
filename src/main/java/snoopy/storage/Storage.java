@@ -87,26 +87,26 @@ public class Storage {
         Task task;
         switch (fields[0]) {
             case "T":
-            if (fields.length != 3 || fields[2].isBlank()) {
-                throw corruptedFileException(lineNumber);
-            }
-            task = new Todo(fields[2]);
-            break;
+                if (fields.length != 3 || fields[2].isBlank()) {
+                    throw corruptedFileException(lineNumber);
+                }
+                task = new Todo(fields[2]);
+                break;
             case "D":
-            if (fields.length != 4 || fields[2].isBlank() || fields[3].isBlank()) {
-                throw corruptedFileException(lineNumber);
-            }
-            task = createDeadline(fields, lineNumber);
-            break;
+                if (fields.length != 4 || fields[2].isBlank() || fields[3].isBlank()) {
+                    throw corruptedFileException(lineNumber);
+                }
+                task = createDeadline(fields, lineNumber);
+                break;
             case "E":
-            if (fields.length != 5 || fields[2].isBlank()
-                    || fields[3].isBlank() || fields[4].isBlank()) {
-                throw corruptedFileException(lineNumber);
-            }
-            task = createEvent(fields, lineNumber);
-            break;
+                if (fields.length != 5 || fields[2].isBlank()
+                        || fields[3].isBlank() || fields[4].isBlank()) {
+                    throw corruptedFileException(lineNumber);
+                }
+                task = createEvent(fields, lineNumber);
+                break;
             default:
-            throw corruptedFileException(lineNumber);
+                throw corruptedFileException(lineNumber);
         }
 
         if (fields[1].equals("1")) {
