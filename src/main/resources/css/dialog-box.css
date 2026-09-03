@@ -1,0 +1,21 @@
+.label {
+    -fx-background-color: linear-gradient(to bottom right, #d9825b, #b85c38);
+    -fx-background-radius: 1em 1em 0 1em;
+    -fx-border-color: #98452b;
+    -fx-border-radius: 1em 1em 0 1em;
+    -fx-border-width: 1px;
+    -fx-font: 14px "Arial";
+    -fx-text-fill: white;
+}
+
+.reply-label {
+    -fx-background-color: #fffaf2;
+    -fx-background-radius: 1em 1em 1em 0;
+    -fx-border-color: #d7c8b6;
+    -fx-border-radius: 1em 1em 1em 0;
+    -fx-text-fill: #3d332b;
+}
+
+#displayPicture {
+    -fx-effect: dropshadow(gaussian, rgba(61, 51, 43, 0.22), 8, 0.4, 2, 2);
+}
