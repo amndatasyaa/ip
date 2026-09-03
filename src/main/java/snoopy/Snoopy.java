@@ -173,6 +173,9 @@ public class Snoopy {
                     case UNKNOWN -> throw new SnoopyException(
                             "Sorry, I don't recognize that command. "
                                     + "Try todo, deadline, event, list, mark, unmark, delete, or find.");
+
+                    default -> throw new IllegalStateException(
+                            "Unexpected command type: " + commandType);
                 }
             } catch (SnoopyException exception) {
                 System.out.println(" OOPS! " + exception.getMessage());
