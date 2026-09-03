@@ -121,25 +121,28 @@ public class Snoopy {
                     int taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     tasks.get(taskIndex).markAsNotDone();
                     storage.save(tasks);
-                    return " OK, I've marked this task as not done yet:\n"
-                            + "   " + tasks.get(taskIndex);
+                    return formatLines(
+                            " OK, I've marked this task as not done yet:",
+                            "   " + tasks.get(taskIndex));
                 }
                 case MARK: {
                     String numberText = command.substring(commandType.getKeyword().length()).trim();
                     int taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     tasks.get(taskIndex).markAsDone();
                     storage.save(tasks);
-                    return " Nice! I've marked this task as done:\n"
-                            + "   " + tasks.get(taskIndex);
+                    return formatLines(
+                            " Nice! I've marked this task as done:",
+                            "   " + tasks.get(taskIndex));
                 }
                 case DELETE: {
                     String numberText = command.substring(commandType.getKeyword().length()).trim();
                     int taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
                     Task removedTask = tasks.remove(taskIndex);
                     storage.save(tasks);
-                    return " Noted. I've removed this task:\n"
-                            + "   " + removedTask + "\n"
-                            + " Now you have " + tasks.size() + " tasks in the list.";
+                    return formatLines(
+                            " Noted. I've removed this task:",
+                            "   " + removedTask,
+                            " Now you have " + tasks.size() + " tasks in the list.");
                 }
                 case FIND:
                     return getFindResponse(command, commandType);
@@ -295,9 +298,20 @@ public class Snoopy {
     private String saveNewTask(Task task) throws IOException {
         tasks.add(task);
         storage.save(tasks);
-        return " Got it. I've added this task:\n"
-                + "   " + task + "\n"
-                + " Now you have " + tasks.size() + " tasks in the list.";
+        return formatLines(
+                " Got it. I've added this task:",
+                "   " + task,
+                " Now you have " + tasks.size() + " tasks in the list.");
+    }
+
+    /**
+     * Joins any number of response lines with newline characters.
+     *
+     * @param lines Response lines in display order.
+     * @return Lines combined into one response.
+     */
+    private static String formatLines(String... lines) {
+        return String.join("\n", lines);
     }
 
     /**
