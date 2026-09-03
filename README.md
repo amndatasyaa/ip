@@ -1,6 +1,7 @@
 # Snoopy
 
-Snoopy is a chatbot project written in Java. Given below are instructions on how to use it.
+Snoopy is a Java chatbot for managing todos, deadlines, and events. It includes a JavaFX graphical
+interface and retains its text interface for automated testing.
 
 ## Setting up in Intellij
 
@@ -13,20 +14,32 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
    1. If there are any further prompts, accept the defaults.
 1. Configure the project to use **JDK 25** (not other versions) as explained in [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
    In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. After that, locate the `src/main/java/snoopy/Snoopy.java` file, right-click it, and choose `Run Snoopy.main()` (if the code editor is showing compile errors, try restarting the IDE). If the setup is correct, you should see something like the below as the output:
-   ```
-   ____________________________________________________________
-     ____
-    / ___| _ __   ___   ___  _ __  _   _
-    \___ \| '_ \ / _ \ / _ \| '_ \| | | |
-     ___) | | | | (_) | (_) | |_) | |_| |
-    |____/|_| |_|\___/ \___/| .__/ \__, |
-                             |_|    |___/
-   Hi! I'm Snoopy.
-   How can I help you today?
-   ____________________________________________________________
-   Bye! See you again soon.
-   ____________________________________________________________
-   ```
+1. Let Gradle finish importing the project and downloading its JavaFX dependencies.
+
+## Running Snoopy
+
+Run the graphical interface from the repository root:
+
+```bash
+./gradlew run
+```
+
+Enter commands in the field at the bottom and press **Enter** or click **Send**. Enter `bye` to close the
+application.
+
+To run the retained text interface in IntelliJ, locate `src/main/java/snoopy/Snoopy.java`, right-click it,
+and choose **Run Snoopy.main()**.
+
+## Supported commands
+
+- `todo <description>`
+- `deadline <description> /by <yyyy-MM-dd>`
+- `event <description> /from <yyyy-MM-dd> /to <yyyy-MM-dd>`
+- `list`
+- `mark <task number>`
+- `unmark <task number>`
+- `delete <task number>`
+- `find <keyword>`
+- `bye`
 
 **Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.

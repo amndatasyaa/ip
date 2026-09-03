@@ -31,7 +31,7 @@ public class Storage {
      *
      * @param filePath Location of the data file.
      */
-    Storage(Path filePath) {
+    public Storage(Path filePath) {
         this.filePath = filePath;
     }
 

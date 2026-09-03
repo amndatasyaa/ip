@@ -131,7 +131,11 @@ def main() -> int:
         print(f"ERROR: {error}", file=sys.stderr)
         return 2
 
-    source_files = sorted((repository_root / "src/main/java").rglob("*.java"))
+    source_files = sorted(
+        source_file
+        for source_file in (repository_root / "src/main/java").rglob("*.java")
+        if "gui" not in source_file.parts and source_file.name != "Launcher.java"
+    )
     if not source_files:
         print("ERROR: No Java source files found", file=sys.stderr)
         return 2

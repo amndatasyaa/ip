@@ -1,30 +1,40 @@
 # Snoopy User Guide
 
-// Update the title above to match the actual product name
+Snoopy is a desktop chatbot that helps you record and manage todos, deadlines, and events using short
+text commands.
 
-// Product screenshot goes here
+## Starting Snoopy
 
-// Product intro goes here
+Run `./gradlew run` from the project folder. Type a command in the field at the bottom of the window,
+then press **Enter** or click **Send**.
+
+## Adding todos
+
+Use `todo <description>` to add a task without a date.
+
+Example: `todo borrow book`
 
 ## Adding deadlines
 
-// Describe the action and its outcome.
+Use `deadline <description> /by <yyyy-MM-dd>` to add a task with a due date.
 
-// Give examples of usage
+Example: `deadline return book /by 2026-09-10`
 
-Example: `keyword (optional arguments)`
+## Adding events
 
-// A description of the expected outcome goes here
+Use `event <description> /from <yyyy-MM-dd> /to <yyyy-MM-dd>` to add an event with start and end dates.
 
-```
-expected output
-```
+Example: `event project meeting /from 2026-09-10 /to 2026-09-11`
 
-## Feature ABC
+## Managing tasks
 
-// Feature details
+- `list` shows all tasks.
+- `mark <number>` marks a task as complete.
+- `unmark <number>` marks it as incomplete.
+- `delete <number>` removes it.
+- `find <keyword>` searches task descriptions.
 
+## Exiting
 
-## Feature XYZ
-
-// Feature details
+Enter `bye` to close Snoopy after its farewell message. You can also close the application using the
+window controls.
