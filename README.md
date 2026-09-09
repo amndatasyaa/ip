@@ -30,6 +30,23 @@ application.
 To run the retained text interface in IntelliJ, locate `src/main/java/snoopy/Snoopy.java`, right-click it,
 and choose **Run Snoopy.main()**.
 
+## Building the JAR file
+
+Build a distributable JAR containing Snoopy and its JavaFX dependencies:
+
+```bash
+./gradlew clean shadowJar
+```
+
+The generated file is `build/libs/snoopy.jar`. Run it using Java 25:
+
+```bash
+java -jar build/libs/snoopy.jar
+```
+
+The bundled JavaFX libraries allow the JAR to run on Windows, macOS, and Linux without a separate
+JavaFX installation.
+
 ## Supported commands
 
 - `todo <description>`
