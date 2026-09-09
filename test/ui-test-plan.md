@@ -50,6 +50,45 @@ ____________________________________________________________
 ____________________________________________________________
 ```
 
+## UI-16: Reject an event ending before it starts
+
+**Aim:** Verify that a reversed event date range is rejected without changing the existing task list.
+
+### Input
+
+```text
+todo anchor
+event holiday /from 2026-09-10 /to 2026-09-09
+list
+bye
+```
+
+### Expected output
+
+```text
+____________________________________________________________
+  ____
+ / ___| _ __   ___   ___  _ __  _   _
+ \___ \| '_ \ / _ \ / _ \| '_ \| | | |
+  ___) | | | | (_) | (_) | |_) | |_| |
+ |____/|_| |_|\___/ \___/| .__/ \__, |
+                            |_|    |___/
+Hi! I'm Snoopy, your happy little helper.
+What can I do for you?
+____________________________________________________________
+ Got it. I've added this task:
+   [T][ ] anchor
+ Now you have 1 tasks in the list.
+____________________________________________________________
+ OOPS! The event end date cannot be before its start date.
+____________________________________________________________
+ Here are the tasks in your list:
+ 1.[T][ ] anchor
+____________________________________________________________
+ Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
 ## UI-12: Save all mutations and load the final state after restart
 
 **Aim:** Verify that additions, mark, unmark, and deletion are persisted with the correct task types, order, details, and completion states.

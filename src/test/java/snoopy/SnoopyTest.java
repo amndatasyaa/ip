@@ -50,6 +50,18 @@ public class SnoopyTest {
     }
 
     @Test
+    public void getResponse_eventEndingBeforeStart_rejectsEventAndPreservesState() {
+        Snoopy snoopy = createSnoopy("reversed-event.txt");
+        snoopy.getResponse("todo anchor");
+
+        assertEquals(" OOPS! The event end date cannot be before its start date.",
+                snoopy.getResponse("event holiday /from 2026-09-10 /to 2026-09-09"));
+        assertEquals(" Here are the tasks in your list:\n"
+                        + " 1.[T][ ] anchor",
+                snoopy.getResponse("list"));
+    }
+
+    @Test
     public void getResponse_bye_requestsApplicationExit() {
         Snoopy snoopy = createSnoopy("bye.txt");
 

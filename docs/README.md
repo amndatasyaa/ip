@@ -23,6 +23,7 @@ Example: `deadline return book /by 2026-09-10`
 ## Adding events
 
 Use `event <description> /from <yyyy-MM-dd> /to <yyyy-MM-dd>` to add an event with start and end dates.
+The end date must be the same as or later than the start date.
 
 Example: `event project meeting /from 2026-09-10 /to 2026-09-11`
 

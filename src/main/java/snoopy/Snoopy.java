@@ -355,6 +355,9 @@ public class Snoopy {
 
         LocalDate from = parseDate(fromText, commandType);
         LocalDate to = parseDate(toText, commandType);
+        if (to.isBefore(from)) {
+            throw new SnoopyException("The event end date cannot be before its start date.");
+        }
         return saveNewTask(new Event(description, from, to));
     }
 
