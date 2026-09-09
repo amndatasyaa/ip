@@ -354,7 +354,7 @@ What can I do for you?
 ____________________________________________________________
  OOPS! Please tell me what to add after 'todo'.
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, delete, or find.
+ OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, todo, deadline, event.
 ____________________________________________________________
  Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -595,7 +595,7 @@ ____________________________________________________________
 Hi! I'm Snoopy, your happy little helper.
 What can I do for you?
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, delete, or find.
+ OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, todo, deadline, event.
 ____________________________________________________________
  Got it. I've added this task:
    [T][ ] spaced task
@@ -607,11 +607,11 @@ ____________________________________________________________
 ____________________________________________________________
  OOPS! '1 extra' is not a valid task number.
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, delete, or find.
+ OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, todo, deadline, event.
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, delete, or find.
+ OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, todo, deadline, event.
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Try todo, deadline, event, list, mark, unmark, delete, or find.
+ OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, todo, deadline, event.
 ____________________________________________________________
  Here are the tasks in your list:
  1.[T][ ] spaced task

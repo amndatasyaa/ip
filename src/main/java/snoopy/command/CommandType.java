@@ -1,6 +1,7 @@
 package snoopy.command;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Represents the commands understood by Snoopy.
@@ -35,6 +36,18 @@ public enum CommandType {
      */
     public String getKeyword() {
         return keyword;
+    }
+
+    /**
+     * Lists all supported command keywords in their enum order.
+     *
+     * @return Comma-separated command keywords, excluding {@link #UNKNOWN}.
+     */
+    public static String getCommandSummary() {
+        return Arrays.stream(values())
+                .filter(commandType -> commandType != UNKNOWN)
+                .map(CommandType::getKeyword)
+                .collect(Collectors.joining(", "));
     }
 
     /**

@@ -159,8 +159,8 @@ public class Snoopy {
                 return addEvent(command, commandType);
             case UNKNOWN:
                 throw new SnoopyException(
-                        "Sorry, I don't recognize that command. "
-                                + "Try todo, deadline, event, list, mark, unmark, delete, or find.");
+                        "Sorry, I don't recognize that command. Available commands: "
+                                + CommandType.getCommandSummary() + ".");
             default:
                 throw new IllegalStateException("Unexpected command type: " + commandType);
         }
