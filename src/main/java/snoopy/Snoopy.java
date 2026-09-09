@@ -46,6 +46,7 @@ public class Snoopy {
      * @param storage Storage used to load and save tasks.
      */
     public Snoopy(Storage storage) {
+        assert storage != null : "Storage must be provided";
         this.storage = storage;
 
         ArrayList<Task> loadedTasks;
@@ -59,6 +60,7 @@ public class Snoopy {
             loadedTasks = new ArrayList<>();
             loadError = " OOPS! I couldn't load the saved tasks.";
         }
+        assert loadedTasks != null : "Storage must return a task list";
         tasks = loadedTasks;
         startupError = loadError;
     }
@@ -108,62 +110,130 @@ public class Snoopy {
     public String getResponse(String input) {
         String command = input == null ? "" : input.trim();
         CommandType commandType = CommandType.fromCommand(command);
+        assert commandType == CommandType.UNKNOWN
+                || command.startsWith(commandType.getKeyword())
+                : "Recognized commands must start with their keyword";
 
         try {
-            switch (commandType) {
-                case BYE:
-                    shouldExit = true;
-                    return " Bye. Hope to see you again soon!";
-                case LIST:
-                    return getTaskListResponse();
-                case UNMARK: {
-                    String numberText = command.substring(commandType.getKeyword().length()).trim();
-                    int taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
-                    tasks.get(taskIndex).markAsNotDone();
-                    storage.save(tasks);
-                    return formatLines(
-                            " OK, I've marked this task as not done yet:",
-                            "   " + tasks.get(taskIndex));
-                }
-                case MARK: {
-                    String numberText = command.substring(commandType.getKeyword().length()).trim();
-                    int taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
-                    tasks.get(taskIndex).markAsDone();
-                    storage.save(tasks);
-                    return formatLines(
-                            " Nice! I've marked this task as done:",
-                            "   " + tasks.get(taskIndex));
-                }
-                case DELETE: {
-                    String numberText = command.substring(commandType.getKeyword().length()).trim();
-                    int taskIndex = parseTaskIndex(numberText, tasks.size(), commandType);
-                    Task removedTask = tasks.remove(taskIndex);
-                    storage.save(tasks);
-                    return formatLines(
-                            " Noted. I've removed this task:",
-                            "   " + removedTask,
-                            " Now you have " + tasks.size() + " tasks in the list.");
-                }
-                case FIND:
-                    return getFindResponse(command, commandType);
-                case TODO:
-                    return addTodo(command, commandType);
-                case DEADLINE:
-                    return addDeadline(command, commandType);
-                case EVENT:
-                    return addEvent(command, commandType);
-                case UNKNOWN:
-                    throw new SnoopyException(
-                            "Sorry, I don't recognize that command. "
-                                    + "Try todo, deadline, event, list, mark, unmark, delete, or find.");
-                default:
-                    throw new IllegalStateException("Unexpected command type: " + commandType);
-            }
+            return executeCommand(command, commandType);
         } catch (SnoopyException exception) {
             return " OOPS! " + exception.getMessage();
         } catch (IOException exception) {
             return " OOPS! I couldn't save the task list.";
         }
+    }
+
+    /**
+     * Dispatches a recognized command to its command-specific handler.
+     *
+     * @param command Complete trimmed command.
+     * @param commandType Type identified from the command.
+     * @return Response to show the user.
+     * @throws SnoopyException If the command arguments are invalid.
+     * @throws IOException If a task-list change cannot be saved.
+     */
+    private String executeCommand(String command, CommandType commandType)
+            throws SnoopyException, IOException {
+        switch (commandType) {
+            case BYE:
+                shouldExit = true;
+                return " Bye. Hope to see you again soon!";
+            case LIST:
+                return getTaskListResponse();
+            case UNMARK:
+                return unmarkTask(command, commandType);
+            case MARK:
+                return markTask(command, commandType);
+            case DELETE:
+                return deleteTask(command, commandType);
+            case FIND:
+                return getFindResponse(command, commandType);
+            case TODO:
+                return addTodo(command, commandType);
+            case DEADLINE:
+                return addDeadline(command, commandType);
+            case EVENT:
+                return addEvent(command, commandType);
+            case UNKNOWN:
+                throw new SnoopyException(
+                        "Sorry, I don't recognize that command. "
+                                + "Try todo, deadline, event, list, mark, unmark, delete, or find.");
+            default:
+                throw new IllegalStateException("Unexpected command type: " + commandType);
+        }
+    }
+
+    /**
+     * Marks the task selected by an unmark command as not done.
+     *
+     * @param command Complete unmark command.
+     * @param commandType Unmark command metadata.
+     * @return Confirmation shown to the user.
+     * @throws SnoopyException If the task number is invalid.
+     * @throws IOException If the task list cannot be saved.
+     */
+    private String unmarkTask(String command, CommandType commandType)
+            throws SnoopyException, IOException {
+        int taskIndex = getTaskIndex(command, commandType);
+        Task task = tasks.get(taskIndex);
+        task.markAsNotDone();
+        storage.save(tasks);
+        return formatLines(
+                " OK, I've marked this task as not done yet:",
+                "   " + task);
+    }
+
+    /**
+     * Marks the task selected by a mark command as done.
+     *
+     * @param command Complete mark command.
+     * @param commandType Mark command metadata.
+     * @return Confirmation shown to the user.
+     * @throws SnoopyException If the task number is invalid.
+     * @throws IOException If the task list cannot be saved.
+     */
+    private String markTask(String command, CommandType commandType)
+            throws SnoopyException, IOException {
+        int taskIndex = getTaskIndex(command, commandType);
+        Task task = tasks.get(taskIndex);
+        task.markAsDone();
+        storage.save(tasks);
+        return formatLines(
+                " Nice! I've marked this task as done:",
+                "   " + task);
+    }
+
+    /**
+     * Removes the task selected by a delete command.
+     *
+     * @param command Complete delete command.
+     * @param commandType Delete command metadata.
+     * @return Confirmation shown to the user.
+     * @throws SnoopyException If the task number is invalid.
+     * @throws IOException If the task list cannot be saved.
+     */
+    private String deleteTask(String command, CommandType commandType)
+            throws SnoopyException, IOException {
+        int taskIndex = getTaskIndex(command, commandType);
+        Task removedTask = tasks.remove(taskIndex);
+        storage.save(tasks);
+        return formatLines(
+                " Noted. I've removed this task:",
+                "   " + removedTask,
+                " Now you have " + tasks.size() + " tasks in the list.");
+    }
+
+    /**
+     * Extracts and validates the task number from a task-selection command.
+     *
+     * @param command Complete task-selection command.
+     * @param commandType Command metadata containing the keyword.
+     * @return Zero-based index of the selected task.
+     * @throws SnoopyException If the task number is invalid.
+     */
+    private int getTaskIndex(String command, CommandType commandType) throws SnoopyException {
+        String numberText = command.substring(commandType.getKeyword().length()).trim();
+        return parseTaskIndex(numberText, tasks.size(), commandType);
     }
 
     /**
@@ -296,7 +366,9 @@ public class Snoopy {
      * @throws IOException If the task cannot be saved.
      */
     private String saveNewTask(Task task) throws IOException {
+        assert task != null : "A new task must be created before it can be saved";
         tasks.add(task);
+        assert tasks.get(tasks.size() - 1) == task : "The new task must be appended to the task list";
         storage.save(tasks);
         return formatLines(
                 " Got it. I've added this task:",
@@ -324,6 +396,8 @@ public class Snoopy {
      */
     private static LocalDate parseDate(String dateText, CommandType commandType)
             throws SnoopyException {
+        assert commandType == CommandType.DEADLINE || commandType == CommandType.EVENT
+                : "Only deadline and event commands contain dates";
         try {
             return LocalDate.parse(dateText);
         } catch (DateTimeParseException exception) {
@@ -346,6 +420,7 @@ public class Snoopy {
      */
     private static int parseTaskIndex(String numberText, int taskCount, CommandType commandType)
             throws SnoopyException {
+        assert taskCount >= 0 : "Task count cannot be negative";
         if (numberText.isEmpty()) {
             throw new SnoopyException(
                     "Please provide a task number, for example '"
@@ -368,6 +443,8 @@ public class Snoopy {
             throw new SnoopyException(
                     "Task " + taskNumber + " does not exist. Choose a number from 1 to " + taskCount + ".");
         }
-        return taskNumber - 1;
+        int taskIndex = taskNumber - 1;
+        assert taskIndex >= 0 && taskIndex < taskCount : "Parsed task index must be within the task list";
+        return taskIndex;
     }
 }

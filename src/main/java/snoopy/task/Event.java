@@ -24,6 +24,8 @@ public class Event extends Task {
      */
     public Event(String description, LocalDate from, LocalDate to) {
         super(description);
+        assert from != null : "Event start date must be provided";
+        assert to != null : "Event end date must be provided";
         this.from = from;
         this.to = to;
     }

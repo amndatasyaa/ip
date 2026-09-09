@@ -32,6 +32,7 @@ public class Storage {
      * @param filePath Location of the data file.
      */
     public Storage(Path filePath) {
+        assert filePath != null : "Storage file path must be provided";
         this.filePath = filePath;
     }
 
@@ -42,8 +43,10 @@ public class Storage {
      * @throws IOException If the folder or file cannot be written.
      */
     public void save(ArrayList<Task> tasks) throws IOException {
+        assert tasks != null : "Task list must be provided when saving";
         ArrayList<String> lines = new ArrayList<>();
         for (Task task : tasks) {
+            assert task != null : "Task list must not contain null entries";
             lines.add(task.toDataString());
         }
         Files.createDirectories(filePath.getParent());
@@ -79,6 +82,7 @@ public class Storage {
      * @throws SnoopyException If the saved data is malformed.
      */
     private Task parseTask(String line, int lineNumber) throws SnoopyException {
+        assert lineNumber > 0 : "Saved task line numbers are one-based";
         String[] fields = line.split(" \\| ", -1);
         if (fields.length < 3 || !(fields[1].equals("0") || fields[1].equals("1"))) {
             throw corruptedFileException(lineNumber);
@@ -109,6 +113,7 @@ public class Storage {
                 throw corruptedFileException(lineNumber);
         }
 
+        assert task != null : "A validated saved record must produce a task";
         if (fields[1].equals("1")) {
             task.markAsDone();
         }
