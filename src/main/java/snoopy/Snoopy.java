@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import snoopy.command.CommandType;
 import snoopy.exception.SnoopyException;
@@ -251,11 +254,7 @@ public class Snoopy {
      * @return Response containing the task list.
      */
     private String getTaskListResponse() {
-        StringBuilder response = new StringBuilder(" Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            response.append("\n ").append(i + 1).append(".").append(tasks.get(i));
-        }
-        return response.toString();
+        return " Here are the tasks in your list:" + formatNumberedTasks(tasks);
     }
 
     /**
@@ -272,15 +271,24 @@ public class Snoopy {
             throw new SnoopyException("Please provide a keyword to find.");
         }
 
-        StringBuilder response = new StringBuilder(" Here are the matching tasks in your list:");
-        int matchNumber = 1;
-        for (Task currentTask : tasks) {
-            if (currentTask.containsKeyword(keyword)) {
-                response.append("\n ").append(matchNumber).append(".").append(currentTask);
-                matchNumber++;
-            }
-        }
-        return response.toString();
+        List<Task> matchingTasks = tasks.stream()
+                .filter(task -> task.containsKeyword(keyword))
+                .toList();
+        return " Here are the matching tasks in your list:" + formatNumberedTasks(matchingTasks);
+    }
+
+    /**
+     * Formats tasks as a one-based numbered list, with each task on a new line.
+     *
+     * @param tasksToFormat Tasks to number in their existing order.
+     * @return Numbered task lines, or an empty string when there are no tasks.
+     */
+    private static String formatNumberedTasks(List<Task> tasksToFormat) {
+        assert tasksToFormat != null : "Task list must be provided for formatting";
+        String numberedTasks = IntStream.range(0, tasksToFormat.size())
+                .mapToObj(index -> " " + (index + 1) + "." + tasksToFormat.get(index))
+                .collect(Collectors.joining("\n"));
+        return numberedTasks.isEmpty() ? "" : "\n" + numberedTasks;
     }
 
     /**

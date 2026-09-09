@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.List;
 
 import snoopy.exception.SnoopyException;
 import snoopy.task.Deadline;
@@ -44,11 +45,10 @@ public class Storage {
      */
     public void save(ArrayList<Task> tasks) throws IOException {
         assert tasks != null : "Task list must be provided when saving";
-        ArrayList<String> lines = new ArrayList<>();
-        for (Task task : tasks) {
-            assert task != null : "Task list must not contain null entries";
-            lines.add(task.toDataString());
-        }
+        assert !tasks.contains(null) : "Task list must not contain null entries";
+        List<String> lines = tasks.stream()
+                .map(Task::toDataString)
+                .toList();
         Files.createDirectories(filePath.getParent());
         Files.write(filePath, lines);
     }

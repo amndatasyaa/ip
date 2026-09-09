@@ -1,5 +1,7 @@
 package snoopy.command;
 
+import java.util.Arrays;
+
 /**
  * Represents the commands understood by Snoopy.
  */
@@ -47,15 +49,14 @@ public enum CommandType {
         }
 
         String firstWord = command.split("\\s+", 2)[0];
-        for (CommandType type : values()) {
-            if (type.keyword.equals(firstWord)) {
-                boolean acceptsArguments = type != BYE && type != LIST;
-                if (!acceptsArguments && !command.equals(type.keyword)) {
-                    return UNKNOWN;
-                }
-                return type;
-            }
+        CommandType type = Arrays.stream(values())
+                .filter(commandType -> commandType.keyword.equals(firstWord))
+                .findFirst()
+                .orElse(UNKNOWN);
+        boolean acceptsArguments = type != BYE && type != LIST;
+        if (!acceptsArguments && !command.equals(type.keyword)) {
+            return UNKNOWN;
         }
-        return UNKNOWN;
+        return type;
     }
 }
