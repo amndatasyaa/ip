@@ -4,7 +4,7 @@ package snoopy.task;
  * Represents a task and whether it has been completed.
  */
 public class Task {
-    private final String description;
+    private String description;
     private boolean isDone;
 
     /**
@@ -39,6 +39,16 @@ public class Task {
      */
     public String getStatusIcon() {
         return isDone ? "X" : " ";
+    }
+
+    /**
+     * Replaces this task's description while keeping its type and other details unchanged.
+     *
+     * @param description New text describing the task.
+     */
+    public void updateDescription(String description) {
+        assert description != null && !description.isBlank() : "Task description must not be blank";
+        this.description = description;
     }
 
     /**

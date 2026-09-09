@@ -62,6 +62,33 @@ public class SnoopyTest {
     }
 
     @Test
+    public void getResponse_updateTask_preservesTypeDateAndCompletionState() {
+        Snoopy snoopy = createSnoopy("update.txt");
+        snoopy.getResponse("deadline return book /by 2026-08-30");
+        snoopy.getResponse("mark 1");
+
+        assertEquals(" Got it. I've updated this task:\n"
+                        + "   [D][X] return library books (by: Aug 30 2026)",
+                snoopy.getResponse("update 1 return library books"));
+        Snoopy reloadedSnoopy = createSnoopy("update.txt");
+        assertEquals(" Here are the tasks in your list:\n"
+                        + " 1.[D][X] return library books (by: Aug 30 2026)",
+                reloadedSnoopy.getResponse("list"));
+    }
+
+    @Test
+    public void getResponse_updateWithoutDescription_rejectsUpdateAndPreservesState() {
+        Snoopy snoopy = createSnoopy("invalid-update.txt");
+        snoopy.getResponse("todo original description");
+
+        assertEquals(" OOPS! Please use: update <task number> <new description>.",
+                snoopy.getResponse("update 1"));
+        assertEquals(" Here are the tasks in your list:\n"
+                        + " 1.[T][ ] original description",
+                snoopy.getResponse("list"));
+    }
+
+    @Test
     public void getResponse_bye_requestsApplicationExit() {
         Snoopy snoopy = createSnoopy("bye.txt");
 

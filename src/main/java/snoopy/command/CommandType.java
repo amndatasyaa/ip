@@ -12,6 +12,7 @@ public enum CommandType {
     UNMARK("unmark"),
     DELETE("delete"),
     FIND("find"),
+    UPDATE("update"),
     TODO("todo"),
     DEADLINE("deadline"),
     EVENT("event"),

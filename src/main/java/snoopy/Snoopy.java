@@ -151,6 +151,8 @@ public class Snoopy {
                 return deleteTask(command, commandType);
             case FIND:
                 return getFindResponse(command, commandType);
+            case UPDATE:
+                return updateTask(command, commandType);
             case TODO:
                 return addTodo(command, commandType);
             case DEADLINE:
@@ -160,7 +162,7 @@ public class Snoopy {
             case UNKNOWN:
                 throw new SnoopyException(
                         "Sorry, I don't recognize that command. "
-                                + "Try todo, deadline, event, list, mark, unmark, delete, or find.");
+                                + "Try todo, deadline, event, list, mark, unmark, delete, find, or update.");
             default:
                 throw new IllegalStateException("Unexpected command type: " + commandType);
         }
@@ -275,6 +277,33 @@ public class Snoopy {
                 .filter(task -> task.containsKeyword(keyword))
                 .toList();
         return " Here are the matching tasks in your list:" + formatNumberedTasks(matchingTasks);
+    }
+
+    /**
+     * Replaces a task's description without changing its type, dates, or completion state.
+     *
+     * @param command Complete update command.
+     * @param commandType Update command metadata.
+     * @return Confirmation shown to the user.
+     * @throws SnoopyException If the task number or new description is invalid.
+     * @throws IOException If the task list cannot be saved.
+     */
+    private String updateTask(String command, CommandType commandType)
+            throws SnoopyException, IOException {
+        String arguments = command.substring(commandType.getKeyword().length()).trim();
+        String[] fields = arguments.split("\\s+", 2);
+        if (fields.length < 2 || fields[1].isBlank()) {
+            throw new SnoopyException(
+                    "Please use: update <task number> <new description>.");
+        }
+
+        int taskIndex = parseTaskIndex(fields[0], tasks.size(), commandType);
+        Task task = tasks.get(taskIndex);
+        task.updateDescription(fields[1].trim());
+        storage.save(tasks);
+        return formatLines(
+                " Got it. I've updated this task:",
+                "   " + task);
     }
 
     /**

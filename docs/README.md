@@ -34,6 +34,10 @@ Example: `event project meeting /from 2026-09-10 /to 2026-09-11`
 - `unmark <number>` marks it as incomplete.
 - `delete <number>` removes it.
 - `find <keyword>` searches task descriptions.
+- `update <number> <new description>` replaces a task's description while preserving its type,
+  dates, and completion state.
+
+Example: `update 2 return all library books`
 
 ## Exiting
 
