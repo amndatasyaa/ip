@@ -394,6 +394,10 @@ public class Snoopy {
      * @return Lines combined into one response.
      */
     private static String formatLines(String... lines) {
+        assert lines != null : "Response lines must be provided";
+        for (String line : lines) {
+            assert line != null : "Response lines must not contain null values";
+        }
         return String.join("\n", lines);
     }
 
