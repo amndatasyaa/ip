@@ -235,8 +235,21 @@ public class Snoopy {
      * @throws SnoopyException If the task number is invalid.
      */
     private int getTaskIndex(String command, CommandType commandType) throws SnoopyException {
-        String numberText = command.substring(commandType.getKeyword().length()).trim();
+        String numberText = getArguments(command, commandType);
         return parseTaskIndex(numberText, tasks.size(), commandType);
+    }
+
+    /**
+     * Returns the trimmed arguments that follow a recognized command keyword.
+     *
+     * @param command Complete trimmed command.
+     * @param commandType Type identified from the command.
+     * @return Command arguments, or an empty string when none were supplied.
+     */
+    private static String getArguments(String command, CommandType commandType) {
+        assert command.startsWith(commandType.getKeyword())
+                : "Command must start with its recognized keyword";
+        return command.substring(commandType.getKeyword().length()).trim();
     }
 
     /**
@@ -266,7 +279,7 @@ public class Snoopy {
      * @throws SnoopyException If the keyword is empty.
      */
     private String getFindResponse(String command, CommandType commandType) throws SnoopyException {
-        String keyword = command.substring(commandType.getKeyword().length()).trim();
+        String keyword = getArguments(command, commandType);
         if (keyword.isEmpty()) {
             throw new SnoopyException("Please provide a keyword to find.");
         }
@@ -301,7 +314,7 @@ public class Snoopy {
      * @throws IOException If the task cannot be saved.
      */
     private String addTodo(String command, CommandType commandType) throws SnoopyException, IOException {
-        String description = command.substring(commandType.getKeyword().length()).trim();
+        String description = getArguments(command, commandType);
         if (description.isEmpty()) {
             throw new SnoopyException("Please tell me what to add after 'todo'.");
         }
