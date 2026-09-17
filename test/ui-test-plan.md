@@ -930,3 +930,51 @@ ____________________________________________________________
  Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
+
+## UI-17: Reject repeated date delimiters and zero-length events
+
+**Aim:** Verify that ambiguous date delimiters and equal event dates are rejected without changing the existing task list.
+
+### Input
+
+```text
+todo anchor
+deadline report /by 2026-09-01 /by 2026-09-02
+event trip /from 2026-09-01 /from 2026-09-02 /to 2026-09-03
+event trip /from 2026-09-01 /to 2026-09-02 /to 2026-09-03
+event one-day /from 2026-09-01 /to 2026-09-01
+list
+bye
+```
+
+### Expected output
+
+```text
+____________________________________________________________
+  ____
+ / ___| _ __   ___   ___  _ __  _   _
+ \___ \| '_ \ / _ \ / _ \| '_ \| | | |
+  ___) | | | | (_) | (_) | |_) | |_| |
+ |____/|_| |_|\___/ \___/| .__/ \__, |
+                            |_|    |___/
+Hi! I'm Snoopy, your happy little helper.
+What can I do for you?
+____________________________________________________________
+ Got it. I've added this task:
+   [T][ ] anchor
+ Now you have 1 tasks in the list.
+____________________________________________________________
+ OOPS! A deadline must contain exactly one '/by' separator.
+____________________________________________________________
+ OOPS! An event must contain exactly one '/from' and one '/to' separator.
+____________________________________________________________
+ OOPS! An event must contain exactly one '/from' and one '/to' separator.
+____________________________________________________________
+ OOPS! The event end date must be after its start date.
+____________________________________________________________
+ Here are the tasks in your list:
+ 1.[T][ ] anchor
+____________________________________________________________
+ Bye. Hope to see you again soon!
+____________________________________________________________
+```

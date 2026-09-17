@@ -146,7 +146,12 @@ public class Storage {
      */
     private Event createEvent(String[] fields, int lineNumber) throws SnoopyException {
         try {
-            return new Event(fields[2], LocalDate.parse(fields[3]), LocalDate.parse(fields[4]));
+            LocalDate from = LocalDate.parse(fields[3]);
+            LocalDate to = LocalDate.parse(fields[4]);
+            if (!to.isAfter(from)) {
+                throw corruptedFileException(lineNumber);
+            }
+            return new Event(fields[2], from, to);
         } catch (DateTimeParseException exception) {
             throw corruptedFileException(lineNumber);
         }

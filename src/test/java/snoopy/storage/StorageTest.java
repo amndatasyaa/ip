@@ -80,7 +80,9 @@ public class StorageTest {
             "T | 0 | ",
             "D | 0 | missing date",
             "E | 0 | meeting | 2026-09-01",
-            "E | 0 | meeting | invalid | 2026-09-02"
+            "E | 0 | meeting | invalid | 2026-09-02",
+            "E | 0 | reversed | 2026-09-02 | 2026-09-01",
+            "E | 0 | same day | 2026-09-01 | 2026-09-01"
         };
 
         for (int i = 0; i < invalidRecords.length; i++) {
