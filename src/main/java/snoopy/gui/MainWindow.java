@@ -62,10 +62,14 @@ public class MainWindow extends AnchorPane {
     private void handleUserInput() {
         String input = userInput.getText();
         String response = snoopy.getResponse(input);
+        String displayResponse = response.stripLeading();
+        DialogBox responseDialog = isErrorResponse(response)
+                ? DialogBox.getErrorDialog(displayResponse, snoopyImage)
+                : DialogBox.getSnoopyDialog(displayResponse, snoopyImage);
 
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
-                DialogBox.getSnoopyDialog(response.stripLeading(), snoopyImage)
+                responseDialog
         );
         userInput.clear();
 
@@ -76,5 +80,16 @@ public class MainWindow extends AnchorPane {
             exitPause.setOnFinished(event -> Platform.exit());
             exitPause.play();
         }
+    }
+
+    /**
+     * Checks whether a response represents a command-processing error.
+     *
+     * @param response Response returned by Snoopy.
+     * @return {@code true} when the response begins with Snoopy's error marker.
+     */
+    static boolean isErrorResponse(String response) {
+        assert response != null : "Response must be provided";
+        return response.stripLeading().startsWith("OOPS!");
     }
 }

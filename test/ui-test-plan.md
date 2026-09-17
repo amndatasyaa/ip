@@ -2,6 +2,12 @@
 
 The tests compare the complete console output exactly, including whitespace and dividers. Each test starts a fresh Snoopy process.
 
+The graphical interface also requires these visual checks because CSS presentation is not represented in console transcripts:
+
+- Invalid commands use Snoopy's red error dialog style, while valid replies retain the neutral reply style.
+- User and Snoopy avatars remain compact and do not obscure message text in the minimum-size window.
+- Resizing the window keeps the conversation pane and input controls usable.
+
 ## UI-01: Add and list all task types
 
 **Aim:** Verify that todos, deadlines, and events are created and displayed using their type-specific formats.

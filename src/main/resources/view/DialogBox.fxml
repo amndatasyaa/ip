@@ -15,7 +15,7 @@
          xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <Label fx:id="dialog"
-               maxWidth="320.0"
+               maxWidth="340.0"
                minHeight="-Infinity"
                text="Label"
                wrapText="true">
@@ -27,8 +27,8 @@
             </padding>
         </Label>
         <ImageView fx:id="displayPicture"
-                   fitHeight="64.0"
-                   fitWidth="64.0"
+                   fitHeight="40.0"
+                   fitWidth="40.0"
                    pickOnBounds="true"
                    preserveRatio="true" />
     </children>
