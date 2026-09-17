@@ -2,16 +2,19 @@ package snoopy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import snoopy.storage.Storage;
+import snoopy.task.Task;
 
 /**
  * Tests the response API shared by Snoopy's text and graphical interfaces.
@@ -34,6 +37,114 @@ public class SnoopyTest {
         assertEquals(" Here are the tasks in your list:\n"
                         + " 1.[T][X] read book",
                 snoopy.getResponse("list"));
+    }
+
+    @Test
+    public void getResponse_addAllTaskTypes_formatsAndPersistsTasks() {
+        Path dataFile = temporaryDirectory.resolve("all-types.txt");
+        Snoopy snoopy = new Snoopy(new Storage(dataFile));
+
+        snoopy.getResponse("todo read book");
+        snoopy.getResponse("deadline return book /by 2026-08-30");
+        snoopy.getResponse("event meeting /from 2026-09-01 /to 2026-09-02");
+
+        Snoopy reloadedSnoopy = new Snoopy(new Storage(dataFile));
+        assertEquals(" Here are the tasks in your list:\n"
+                        + " 1.[T][ ] read book\n"
+                        + " 2.[D][ ] return book (by: Aug 30 2026)\n"
+                        + " 3.[E][ ] meeting (from: Sep 01 2026 to: Sep 02 2026)",
+                reloadedSnoopy.getResponse("list"));
+    }
+
+    @Test
+    public void getResponse_unmarkAndDelete_updateCorrectTasks() {
+        Snoopy snoopy = createSnoopy("unmark-delete.txt");
+        snoopy.getResponse("todo first");
+        snoopy.getResponse("todo second");
+        snoopy.getResponse("mark 1");
+
+        assertEquals(" OK, I've marked this task as not done yet:\n"
+                        + "   [T][ ] first",
+                snoopy.getResponse("unmark 1"));
+        assertEquals(" Noted. I've removed this task:\n"
+                        + "   [T][ ] first\n"
+                        + " Now you have 1 tasks in the list.",
+                snoopy.getResponse("delete 1"));
+        assertEquals(" Here are the tasks in your list:\n"
+                        + " 1.[T][ ] second",
+                snoopy.getResponse("list"));
+    }
+
+    @Test
+    public void getResponse_findMatchesDescriptionsAndRenumbersResults() {
+        Snoopy snoopy = createSnoopy("find.txt");
+        snoopy.getResponse("todo read book");
+        snoopy.getResponse("deadline return book /by 2026-08-30");
+        snoopy.getResponse("todo call Alice");
+
+        assertEquals(" Here are the matching tasks in your list:\n"
+                        + " 1.[T][ ] read book\n"
+                        + " 2.[D][ ] return book (by: Aug 30 2026)",
+                snoopy.getResponse("find book"));
+        assertEquals(" Here are the matching tasks in your list:",
+                snoopy.getResponse("find Book"));
+        assertEquals(" OOPS! Please provide a keyword to find.",
+                snoopy.getResponse("find"));
+    }
+
+    @Test
+    public void getResponse_invalidTaskNumbers_returnSpecificErrors() {
+        Snoopy snoopy = createSnoopy("task-numbers.txt");
+
+        assertEquals(" OOPS! Please provide a task number, for example 'mark 2'.",
+                snoopy.getResponse("mark"));
+        assertEquals(" OOPS! Your task list is empty, so there is no task to delete.",
+                snoopy.getResponse("delete 1"));
+        snoopy.getResponse("todo only task");
+        assertEquals(" OOPS! 'abc' is not a valid task number.",
+                snoopy.getResponse("unmark abc"));
+        assertEquals(" OOPS! Task 0 does not exist. Choose a number from 1 to 1.",
+                snoopy.getResponse("mark 0"));
+        assertEquals(" OOPS! Task 2 does not exist. Choose a number from 1 to 1.",
+                snoopy.getResponse("delete 2"));
+    }
+
+    @Test
+    public void getResponse_nullBlankAndUnknownCommands_returnCommandHelp() {
+        Snoopy snoopy = createSnoopy("unknown.txt");
+        String helpResponse = " OOPS! Sorry, I don't recognize that command. Available commands: "
+                + "bye, list, mark, unmark, delete, find, todo, deadline, event.";
+
+        assertEquals(helpResponse, snoopy.getResponse(null));
+        assertEquals(helpResponse, snoopy.getResponse("   "));
+        assertEquals(helpResponse, snoopy.getResponse("unknown"));
+    }
+
+    @Test
+    public void getResponse_malformedTaskDetails_returnSpecificErrors() {
+        Snoopy snoopy = createSnoopy("malformed.txt");
+
+        assertEquals(" OOPS! Please tell me what to add after 'todo'.",
+                snoopy.getResponse("todo"));
+        assertEquals(" OOPS! Please use: deadline <description> /by <date or time>.",
+                snoopy.getResponse("deadline report"));
+        assertEquals(" OOPS! A deadline needs both a description and a '/by' value.",
+                snoopy.getResponse("deadline /by 2026-08-30"));
+        assertEquals(" OOPS! Please use: event <description> /from <start> /to <end>.",
+                snoopy.getResponse("event meeting /to 2026-09-02 /from 2026-09-01"));
+        assertEquals(" OOPS! An event needs a description, a '/from' value, and a '/to' value.",
+                snoopy.getResponse("event /from 2026-09-01 /to 2026-09-02"));
+        assertEquals(" OOPS! An event needs a description, a '/from' value, and a '/to' value.",
+                snoopy.getResponse("event meeting /from /to 2026-09-02"));
+        assertEquals(" OOPS! Please enter event dates as yyyy-MM-dd, for example 2019-10-15.",
+                snoopy.getResponse("event meeting /from Monday /to 2026-09-02"));
+    }
+
+    @Test
+    public void getResponse_storageSaveFails_returnsErrorResponse() {
+        Snoopy snoopy = new Snoopy(new FailingStorage(temporaryDirectory.resolve("save-failure.txt"), false));
+
+        assertEquals(" OOPS! I couldn't save the task list.", snoopy.getResponse("todo read book"));
     }
 
     @Test
@@ -83,6 +194,31 @@ public class SnoopyTest {
                 snoopy.getWelcomeMessage());
     }
 
+    @Test
+    public void getWelcomeMessage_normalStorage_returnsGreetingWithoutError() {
+        Snoopy snoopy = createSnoopy("welcome.txt");
+
+        assertEquals("Hi! I'm Snoopy, your happy little helper.\n"
+                        + "What can I do for you?",
+                snoopy.getWelcomeMessage());
+    }
+
+    @Test
+    public void getWelcomeMessage_storageReadFails_includesGenericLoadError() {
+        Snoopy snoopy = new Snoopy(new FailingStorage(temporaryDirectory.resolve("load-failure.txt"), true));
+
+        assertEquals("Hi! I'm Snoopy, your happy little helper.\n"
+                        + "What can I do for you?\n\n"
+                        + "OOPS! I couldn't load the saved tasks.",
+                snoopy.getWelcomeMessage());
+        assertEquals(" Here are the tasks in your list:", snoopy.getResponse("list"));
+    }
+
+    @Test
+    public void constructor_nullStorage_failsAssertion() {
+        assertThrows(AssertionError.class, () -> new Snoopy(null));
+    }
+
     /**
      * Creates Snoopy with an isolated data file for one test.
      *
@@ -91,5 +227,30 @@ public class SnoopyTest {
      */
     private Snoopy createSnoopy(String fileName) {
         return new Snoopy(new Storage(temporaryDirectory.resolve(fileName)));
+    }
+
+    /**
+     * Storage test double that fails either loading or saving.
+     */
+    private static class FailingStorage extends Storage {
+        private final boolean shouldFailLoad;
+
+        FailingStorage(Path filePath, boolean shouldFailLoad) {
+            super(filePath);
+            this.shouldFailLoad = shouldFailLoad;
+        }
+
+        @Override
+        public ArrayList<Task> load() throws IOException {
+            if (shouldFailLoad) {
+                throw new IOException("Simulated read failure");
+            }
+            return new ArrayList<>();
+        }
+
+        @Override
+        public void save(ArrayList<Task> tasks) throws IOException {
+            throw new IOException("Simulated write failure");
+        }
     }
 }

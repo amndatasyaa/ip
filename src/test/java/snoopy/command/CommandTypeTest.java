@@ -15,6 +15,20 @@ public class CommandTypeTest {
     }
 
     @Test
+    public void getKeyword_everyCommand_returnsConfiguredKeyword() {
+        assertEquals("bye", CommandType.BYE.getKeyword());
+        assertEquals("list", CommandType.LIST.getKeyword());
+        assertEquals("mark", CommandType.MARK.getKeyword());
+        assertEquals("unmark", CommandType.UNMARK.getKeyword());
+        assertEquals("delete", CommandType.DELETE.getKeyword());
+        assertEquals("find", CommandType.FIND.getKeyword());
+        assertEquals("todo", CommandType.TODO.getKeyword());
+        assertEquals("deadline", CommandType.DEADLINE.getKeyword());
+        assertEquals("event", CommandType.EVENT.getKeyword());
+        assertEquals("", CommandType.UNKNOWN.getKeyword());
+    }
+
+    @Test
     public void fromCommand_supportedCommands_returnsMatchingTypes() {
         assertEquals(CommandType.BYE, CommandType.fromCommand("bye"));
         assertEquals(CommandType.LIST, CommandType.fromCommand("list"));
@@ -54,5 +68,6 @@ public class CommandTypeTest {
     @Test
     public void fromCommand_multipleSpacesAfterKeyword_returnsMatchingType() {
         assertEquals(CommandType.TODO, CommandType.fromCommand("todo   read book"));
+        assertEquals(CommandType.MARK, CommandType.fromCommand("mark\t2"));
     }
 }
