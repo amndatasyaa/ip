@@ -1,21 +1,22 @@
 .label {
-    -fx-background-color: linear-gradient(to bottom right, #d99a42, #a76128);
-    -fx-background-radius: 1em 1em 0 1em;
-    -fx-border-color: #87491f;
-    -fx-border-radius: 1em 1em 0 1em;
+    -fx-background-color: #171717;
+    -fx-background-radius: 18px;
+    -fx-border-color: #171717;
+    -fx-border-radius: 18px;
     -fx-border-width: 1px;
     -fx-font: 14px "System";
     -fx-text-fill: white;
 }
 
 .reply-label {
-    -fx-background-color: #f8f4e8;
-    -fx-background-radius: 1em 1em 1em 0;
-    -fx-border-color: #9aae7a;
-    -fx-border-radius: 1em 1em 1em 0;
-    -fx-text-fill: #263827;
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 18px;
+    -fx-border-color: #d71920;
+    -fx-border-radius: 18px;
+    -fx-border-width: 1px 1px 1px 4px;
+    -fx-text-fill: #171717;
 }
 
 #displayPicture {
-    -fx-effect: dropshadow(gaussian, rgba(38, 56, 39, 0.22), 8, 0.4, 2, 2);
+    -fx-effect: dropshadow(gaussian, rgba(23, 23, 23, 0.22), 8, 0.4, 2, 2);
 }

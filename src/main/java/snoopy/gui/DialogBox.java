@@ -13,11 +13,14 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.shape.Circle;
 
 /**
- * Represents a chat message together with its sender's display picture.
+ * Represents a chat message with an optional sender display picture.
  */
 public class DialogBox extends HBox {
+
+    private static final double DISPLAY_PICTURE_RADIUS = 28.0;
 
     @FXML
     private Label dialog;
@@ -44,10 +47,22 @@ public class DialogBox extends HBox {
 
         dialog.setText(text);
         displayPicture.setImage(image);
+        displayPicture.setClip(new Circle(
+                DISPLAY_PICTURE_RADIUS, DISPLAY_PICTURE_RADIUS, DISPLAY_PICTURE_RADIUS));
     }
 
     /**
-     * Flips the dialog box so that the display picture is on the left.
+     * Creates a text-only dialog box without a display picture.
+     *
+     * @param text Text shown in the dialog box.
+     */
+    private DialogBox(String text) {
+        this(text, null);
+        getChildren().remove(displayPicture);
+    }
+
+    /**
+     * Aligns a Snoopy reply to the left and applies its reply style.
      */
     private void flip() {
         ObservableList<Node> children = FXCollections.observableArrayList(getChildren());
@@ -58,14 +73,13 @@ public class DialogBox extends HBox {
     }
 
     /**
-     * Creates a dialog box for a command sent by the user.
+     * Creates a text-only dialog box for a command sent by the user.
      *
      * @param text Command sent by the user.
-     * @param image User's display picture.
      * @return Dialog box aligned for the user.
      */
-    public static DialogBox getUserDialog(String text, Image image) {
-        return new DialogBox(text, image);
+    public static DialogBox getUserDialog(String text) {
+        return new DialogBox(text);
     }
 
     /**

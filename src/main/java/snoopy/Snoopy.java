@@ -21,7 +21,7 @@ import snoopy.task.Todo;
  * Processes Snoopy commands for both the text and graphical user interfaces.
  */
 public class Snoopy {
-    private static final String DISPLAY_NAME = "Snoopy Scout";
+    private static final String DISPLAY_NAME = "Snoopy";
     private static final String DIVIDER = "____________________________________________________________";
     private static final String BANNER = "  ____\n"
             + " / ___| _ __   ___   ___  _ __  _   _\n"
@@ -31,8 +31,6 @@ public class Snoopy {
             + "                            |_|    |___/";
     private static final String WELCOME_MESSAGE = "Hi! I'm Snoopy, your happy little helper.\n"
             + "What can I do for you?";
-    private static final String GUI_WELCOME_MESSAGE = "Snoopy Scout reporting for duty!\n"
-            + "Let's sniff out the next task on your trail.";
 
     private final Storage storage;
     private final ArrayList<Task> tasks;
@@ -108,21 +106,18 @@ public class Snoopy {
     }
 
     /**
-     * Returns Snoopy Scout's personality-focused greeting for the graphical interface.
+     * Returns Snoopy's greeting for the graphical interface.
      *
      * @return Graphical greeting and any storage-loading error.
      */
     public String getGuiWelcomeMessage() {
-        if (startupError == null) {
-            return GUI_WELCOME_MESSAGE;
-        }
-        return GUI_WELCOME_MESSAGE + "\n\n" + startupError.stripLeading();
+        return getWelcomeMessage();
     }
 
     /**
      * Returns the chatbot name displayed by the graphical interface.
      *
-     * @return Snoopy Scout's display name.
+     * @return Snoopy's display name.
      */
     public String getDisplayName() {
         return DISPLAY_NAME;

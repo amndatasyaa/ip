@@ -4,9 +4,10 @@ The tests compare the complete console output exactly, including whitespace and 
 
 The graphical interface also requires these personality checks because visual presentation is not represented in console transcripts:
 
-- The window title and greeting identify the chatbot as Snoopy Scout.
-- Forest-green, cream, and trail-orange colors reinforce the outdoor scout theme.
-- The input prompt and button use the trail-themed wording "Name the next trail task" and "Track".
+- The window title and greeting identify the chatbot as Snoopy.
+- Black, white, and Snoopy-red colors give the interface a classic comic-inspired theme.
+- Snoopy replies show the circular-cropped black-and-white beagle avatar, while user messages remain text-only.
+- Every message bubble has evenly rounded corners, and the action button is labeled "Send".
 
 ## UI-01: Add and list all task types
 

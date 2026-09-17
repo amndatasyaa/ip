@@ -84,17 +84,17 @@ public class SnoopyTest {
     }
 
     @Test
-    public void getGuiWelcomeMessage_normalStartup_usesScoutPersonality() {
+    public void getGuiWelcomeMessage_normalStartup_usesSnoopyIdentity() {
         Snoopy snoopy = createSnoopy("gui-welcome.txt");
 
-        assertEquals("Snoopy Scout reporting for duty!\n"
-                        + "Let's sniff out the next task on your trail.",
+        assertEquals("Hi! I'm Snoopy, your happy little helper.\n"
+                        + "What can I do for you?",
                 snoopy.getGuiWelcomeMessage());
-        assertEquals("Snoopy Scout", snoopy.getDisplayName());
+        assertEquals("Snoopy", snoopy.getDisplayName());
     }
 
     @Test
-    public void getResponse_findCommand_usesScoutPersonality() {
+    public void getResponse_findCommand_usesSnoopyPersonality() {
         Snoopy snoopy = createSnoopy("personality-find.txt");
         snoopy.getResponse("todo read book");
 
