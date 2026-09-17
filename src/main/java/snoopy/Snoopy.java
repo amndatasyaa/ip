@@ -21,6 +21,7 @@ import snoopy.task.Todo;
  * Processes Snoopy commands for both the text and graphical user interfaces.
  */
 public class Snoopy {
+    private static final String DISPLAY_NAME = "Snoopy Scout";
     private static final String DIVIDER = "____________________________________________________________";
     private static final String BANNER = "  ____\n"
             + " / ___| _ __   ___   ___  _ __  _   _\n"
@@ -30,6 +31,8 @@ public class Snoopy {
             + "                            |_|    |___/";
     private static final String WELCOME_MESSAGE = "Hi! I'm Snoopy, your happy little helper.\n"
             + "What can I do for you?";
+    private static final String GUI_WELCOME_MESSAGE = "Snoopy Scout reporting for duty!\n"
+            + "Let's sniff out the next task on your trail.";
 
     private final Storage storage;
     private final ArrayList<Task> tasks;
@@ -93,7 +96,7 @@ public class Snoopy {
     }
 
     /**
-     * Returns the greeting shown when the graphical interface starts.
+     * Returns the greeting shown when the text interface starts.
      *
      * @return Greeting and any storage-loading error.
      */
@@ -102,6 +105,27 @@ public class Snoopy {
             return WELCOME_MESSAGE;
         }
         return WELCOME_MESSAGE + "\n\n" + startupError.stripLeading();
+    }
+
+    /**
+     * Returns Snoopy Scout's personality-focused greeting for the graphical interface.
+     *
+     * @return Graphical greeting and any storage-loading error.
+     */
+    public String getGuiWelcomeMessage() {
+        if (startupError == null) {
+            return GUI_WELCOME_MESSAGE;
+        }
+        return GUI_WELCOME_MESSAGE + "\n\n" + startupError.stripLeading();
+    }
+
+    /**
+     * Returns the chatbot name displayed by the graphical interface.
+     *
+     * @return Snoopy Scout's display name.
+     */
+    public String getDisplayName() {
+        return DISPLAY_NAME;
     }
 
     /**
@@ -281,13 +305,14 @@ public class Snoopy {
     private String getFindResponse(String command, CommandType commandType) throws SnoopyException {
         String keyword = getArguments(command, commandType);
         if (keyword.isEmpty()) {
-            throw new SnoopyException("Please provide a keyword to find.");
+            throw new SnoopyException(
+                    "I need a scent to follow. Please provide a keyword to find.");
         }
 
         List<Task> matchingTasks = tasks.stream()
                 .filter(task -> task.containsKeyword(keyword))
                 .toList();
-        return " Here are the matching tasks in your list:" + formatNumberedTasks(matchingTasks);
+        return " I sniffed out these matching tasks:" + formatNumberedTasks(matchingTasks);
     }
 
     /**

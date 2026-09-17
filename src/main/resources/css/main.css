@@ -1,13 +1,13 @@
 .root {
-    main-color: #f5f0e6;
-    accent-color: #b85c38;
+    main-color: #eef3e6;
+    accent-color: #496b3a;
     -fx-background-color: main-color;
 }
 
 .text-field {
     -fx-background-color: white;
     -fx-background-radius: 8px;
-    -fx-border-color: #d7c8b6;
+    -fx-border-color: #a9b99a;
     -fx-border-radius: 8px;
     -fx-font: 15px "Arial";
 }
@@ -24,7 +24,7 @@
 }
 
 .button:hover {
-    -fx-background-color: derive(accent-color, 15%);
+    -fx-background-color: derive(accent-color, 12%);
 }
 
 .button:pressed {
@@ -42,7 +42,7 @@
 }
 
 .scroll-bar .thumb {
-    -fx-background-color: #baa68e;
+    -fx-background-color: #92a781;
     -fx-background-radius: 1em;
 }
 

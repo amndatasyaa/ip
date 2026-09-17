@@ -52,7 +52,7 @@ public class MainWindow extends AnchorPane {
     public void setSnoopy(Snoopy snoopy) {
         this.snoopy = snoopy;
         dialogContainer.getChildren().add(
-                DialogBox.getSnoopyDialog(snoopy.getWelcomeMessage(), snoopyImage));
+                DialogBox.getSnoopyDialog(snoopy.getGuiWelcomeMessage(), snoopyImage));
     }
 
     /**

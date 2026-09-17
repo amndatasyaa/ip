@@ -30,7 +30,7 @@
         <TextField fx:id="userInput"
                    onAction="#handleUserInput"
                    prefHeight="44.0"
-                   promptText="Type a command..."
+                   promptText="Name the next trail task..."
                    AnchorPane.bottomAnchor="5.0"
                    AnchorPane.leftAnchor="6.0"
                    AnchorPane.rightAnchor="92.0" />
@@ -39,7 +39,7 @@
                 onAction="#handleUserInput"
                 prefHeight="44.0"
                 prefWidth="80.0"
-                text="Send"
+                text="Track"
                 AnchorPane.bottomAnchor="5.0"
                 AnchorPane.rightAnchor="6.0" />
     </children>

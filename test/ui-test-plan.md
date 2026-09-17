@@ -2,6 +2,12 @@
 
 The tests compare the complete console output exactly, including whitespace and dividers. Each test starts a fresh Snoopy process.
 
+The graphical interface also requires these personality checks because visual presentation is not represented in console transcripts:
+
+- The window title and greeting identify the chatbot as Snoopy Scout.
+- Forest-green, cream, and trail-orange colors reinforce the outdoor scout theme.
+- The input prompt and button use the trail-themed wording "Name the next trail task" and "Track".
+
 ## UI-01: Add and list all task types
 
 **Aim:** Verify that todos, deadlines, and events are created and displayed using their type-specific formats.
@@ -672,16 +678,16 @@ ____________________________________________________________
  Nice! I've marked this task as done:
    [D][X] return book (by: Aug 30 2026)
 ____________________________________________________________
- Here are the matching tasks in your list:
+ I sniffed out these matching tasks:
  1.[T][ ] read book
  2.[D][X] return book (by: Aug 30 2026)
  3.[E][ ] book club (from: Sep 01 2026 to: Sep 02 2026)
 ____________________________________________________________
- Here are the matching tasks in your list:
+ I sniffed out these matching tasks:
 ____________________________________________________________
- Here are the matching tasks in your list:
+ I sniffed out these matching tasks:
 ____________________________________________________________
- OOPS! Please provide a keyword to find.
+ OOPS! I need a scent to follow. Please provide a keyword to find.
 ____________________________________________________________
  Here are the tasks in your list:
  1.[T][ ] read book

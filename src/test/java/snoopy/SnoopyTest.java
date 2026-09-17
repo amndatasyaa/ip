@@ -83,6 +83,28 @@ public class SnoopyTest {
                 snoopy.getWelcomeMessage());
     }
 
+    @Test
+    public void getGuiWelcomeMessage_normalStartup_usesScoutPersonality() {
+        Snoopy snoopy = createSnoopy("gui-welcome.txt");
+
+        assertEquals("Snoopy Scout reporting for duty!\n"
+                        + "Let's sniff out the next task on your trail.",
+                snoopy.getGuiWelcomeMessage());
+        assertEquals("Snoopy Scout", snoopy.getDisplayName());
+    }
+
+    @Test
+    public void getResponse_findCommand_usesScoutPersonality() {
+        Snoopy snoopy = createSnoopy("personality-find.txt");
+        snoopy.getResponse("todo read book");
+
+        assertEquals(" I sniffed out these matching tasks:\n"
+                        + " 1.[T][ ] read book",
+                snoopy.getResponse("find book"));
+        assertEquals(" OOPS! I need a scent to follow. Please provide a keyword to find.",
+                snoopy.getResponse("find"));
+    }
+
     /**
      * Creates Snoopy with an isolated data file for one test.
      *
