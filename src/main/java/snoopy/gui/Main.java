@@ -24,7 +24,7 @@ public class Main extends Application {
         MainWindow mainWindow = fxmlLoader.getController();
         mainWindow.setSnoopy(snoopy);
 
-        stage.setTitle("Snoopy");
+        stage.setTitle(snoopy.getDisplayName());
         stage.setMinHeight(480.0);
         stage.setMinWidth(420.0);
         stage.setScene(scene);

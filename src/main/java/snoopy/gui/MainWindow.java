@@ -18,8 +18,8 @@ import snoopy.Snoopy;
 public class MainWindow extends AnchorPane {
     private static final Duration EXIT_DELAY = Duration.seconds(1.2);
 
-    private final Image userImage = new Image(getClass().getResourceAsStream("/images/user.png"));
-    private final Image snoopyImage = new Image(getClass().getResourceAsStream("/images/snoopy.png"));
+    private final Image snoopyImage = new Image(
+            getClass().getResourceAsStream("/images/snoopy-avatar.png"));
 
     @FXML
     private ScrollPane scrollPane;
@@ -52,7 +52,7 @@ public class MainWindow extends AnchorPane {
     public void setSnoopy(Snoopy snoopy) {
         this.snoopy = snoopy;
         dialogContainer.getChildren().add(
-                DialogBox.getSnoopyDialog(snoopy.getWelcomeMessage(), snoopyImage));
+                DialogBox.getSnoopyDialog(snoopy.getGuiWelcomeMessage(), snoopyImage));
     }
 
     /**
@@ -64,7 +64,7 @@ public class MainWindow extends AnchorPane {
         String response = snoopy.getResponse(input);
 
         dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input, userImage),
+                DialogBox.getUserDialog(input),
                 DialogBox.getSnoopyDialog(response.stripLeading(), snoopyImage)
         );
         userInput.clear();

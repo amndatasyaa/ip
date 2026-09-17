@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -10,8 +11,15 @@
             stylesheets="@../css/main.css"
             xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="snoopy.gui.MainWindow">
+    fx:controller="snoopy.gui.MainWindow">
     <children>
+        <Label alignment="CENTER_LEFT"
+               prefHeight="44.0"
+               styleClass="app-title"
+               text="Snoopy"
+               AnchorPane.leftAnchor="0.0"
+               AnchorPane.rightAnchor="0.0"
+               AnchorPane.topAnchor="0.0" />
         <ScrollPane fx:id="scrollPane"
                     fitToWidth="true"
                     hbarPolicy="NEVER"
@@ -20,10 +28,10 @@
                     AnchorPane.bottomAnchor="54.0"
                     AnchorPane.leftAnchor="0.0"
                     AnchorPane.rightAnchor="0.0"
-                    AnchorPane.topAnchor="0.0">
+                    AnchorPane.topAnchor="44.0">
             <content>
                 <VBox fx:id="dialogContainer"
-                      prefHeight="552.0"
+                      prefHeight="500.0"
                       prefWidth="428.0" />
             </content>
         </ScrollPane>

@@ -1,13 +1,23 @@
 .root {
-    main-color: #f5f0e6;
-    accent-color: #b85c38;
+    main-color: #f7f7f5;
+    accent-color: #d71920;
+    ink-color: #171717;
     -fx-background-color: main-color;
+}
+
+.app-title {
+    -fx-background-color: white;
+    -fx-border-color: accent-color;
+    -fx-border-width: 0 0 3px 0;
+    -fx-font: bold 20px "Arial";
+    -fx-padding: 0 14px 0 14px;
+    -fx-text-fill: ink-color;
 }
 
 .text-field {
     -fx-background-color: white;
     -fx-background-radius: 8px;
-    -fx-border-color: #d7c8b6;
+    -fx-border-color: ink-color;
     -fx-border-radius: 8px;
     -fx-font: 15px "Arial";
 }
@@ -24,7 +34,7 @@
 }
 
 .button:hover {
-    -fx-background-color: derive(accent-color, 15%);
+    -fx-background-color: derive(accent-color, 18%);
 }
 
 .button:pressed {
@@ -42,7 +52,7 @@
 }
 
 .scroll-bar .thumb {
-    -fx-background-color: #baa68e;
+    -fx-background-color: ink-color;
     -fx-background-radius: 1em;
 }
 
