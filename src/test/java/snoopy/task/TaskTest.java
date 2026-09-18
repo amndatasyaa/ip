@@ -16,16 +16,19 @@ public class TaskTest {
     public void completionState_markAndUnmark_updatesAllRepresentations() {
         Task task = new Task("read book");
 
+        assertFalse(task.isDone());
         assertEquals(" ", task.getStatusIcon());
         assertEquals("0 | read book", task.toDataString());
         assertEquals("[ ] read book", task.toString());
 
         task.markAsDone();
+        assertTrue(task.isDone());
         assertEquals("X", task.getStatusIcon());
         assertEquals("1 | read book", task.toDataString());
         assertEquals("[X] read book", task.toString());
 
         task.markAsNotDone();
+        assertFalse(task.isDone());
         assertEquals(" ", task.getStatusIcon());
         assertEquals("0 | read book", task.toDataString());
         assertEquals("[ ] read book", task.toString());
