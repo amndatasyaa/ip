@@ -2,7 +2,9 @@ package snoopy.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,8 +29,33 @@ public class StorageTest {
     private Path temporaryDirectory;
 
     @Test
+    public void constructor_defaultPath_createsStorageInstance() {
+        assertNotNull(new Storage());
+    }
+
+    @Test
     public void load_missingDataFile_returnsEmptyList() throws IOException, SnoopyException {
         Storage storage = new Storage(temporaryDirectory.resolve("data/snoopy.txt"));
+
+        assertEquals(new ArrayList<>(), storage.load());
+    }
+
+    @Test
+    public void save_emptyTaskList_createsNestedEmptyFile() throws IOException {
+        Path dataFile = temporaryDirectory.resolve("nested/data/snoopy.txt");
+        Storage storage = new Storage(dataFile);
+
+        storage.save(new ArrayList<>());
+
+        assertTrue(Files.exists(dataFile));
+        assertEquals("", Files.readString(dataFile));
+    }
+
+    @Test
+    public void load_emptyDataFile_returnsEmptyList() throws IOException, SnoopyException {
+        Path dataFile = temporaryDirectory.resolve("empty.txt");
+        Files.createFile(dataFile);
+        Storage storage = new Storage(dataFile);
 
         assertEquals(new ArrayList<>(), storage.load());
     }
@@ -73,14 +100,38 @@ public class StorageTest {
     }
 
     @Test
+    public void load_completedTodoAndEvent_restoresCompletionStates() throws IOException, SnoopyException {
+        Path dataFile = temporaryDirectory.resolve("completed.txt");
+        Files.writeString(dataFile, "T | 1 | done todo\n"
+                + "E | 1 | done event | 2026-09-01 | 2026-09-02\n");
+        Storage storage = new Storage(dataFile);
+
+        ArrayList<Task> tasks = storage.load();
+
+        assertEquals("[T][X] done todo", tasks.get(0).toString());
+        assertEquals("[E][X] done event (from: Sep 01 2026 to: Sep 02 2026)",
+                tasks.get(1).toString());
+    }
+
+    @Test
     public void load_invalidRecordShapes_rejectsEachRecord() {
         String[] invalidRecords = {
+            "T | 0",
             "T | 2 | invalid status",
             "X | 0 | unknown type",
             "T | 0 | ",
+            "T | 0 | extra | field",
             "D | 0 | missing date",
+            "D | 0 |  | 2026-09-01",
+            "D | 0 | invalid date | 2026-02-30",
             "E | 0 | meeting | 2026-09-01",
-            "E | 0 | meeting | invalid | 2026-09-02"
+            "E | 0 |  | 2026-09-01 | 2026-09-02",
+            "E | 0 | meeting |  | 2026-09-02",
+            "E | 0 | meeting | 2026-09-01 | ",
+            "E | 0 | meeting | invalid | 2026-09-02",
+            "E | 0 | meeting | 2026-09-01 | invalid",
+            "E | 0 | reversed | 2026-09-02 | 2026-09-01",
+            "E | 0 | same day | 2026-09-01 | 2026-09-01"
         };
 
         for (int i = 0; i < invalidRecords.length; i++) {
@@ -96,5 +147,29 @@ public class StorageTest {
                     "Expected record to be rejected: " + invalidRecords[i]);
             assertEquals("The data file is corrupted at line 1.", exception.getMessage());
         }
+    }
+
+    @Test
+    public void save_invalidParent_throwsError() throws IOException {
+        Path parentFile = temporaryDirectory.resolve("not-a-directory");
+        Files.writeString(parentFile, "content");
+        Storage storage = new Storage(parentFile.resolve("snoopy.txt"));
+
+        assertThrows(IOException.class, () -> storage.save(new ArrayList<>()));
+    }
+
+    @Test
+    public void constructor_nullPath_failsAssertion() {
+        assertThrows(AssertionError.class, () -> new Storage(null));
+    }
+
+    @Test
+    public void save_invalidTaskLists_failAssertions() {
+        Storage storage = new Storage(temporaryDirectory.resolve("assertions.txt"));
+        ArrayList<Task> tasksWithNull = new ArrayList<>();
+        tasksWithNull.add(null);
+
+        assertThrows(AssertionError.class, () -> storage.save(null));
+        assertThrows(AssertionError.class, () -> storage.save(tasksWithNull));
     }
 }

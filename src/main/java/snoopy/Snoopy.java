@@ -200,8 +200,7 @@ public class Snoopy {
             throws SnoopyException, IOException {
         int taskIndex = getTaskIndex(command, commandType);
         Task task = tasks.get(taskIndex);
-        task.markAsNotDone();
-        storage.save(tasks);
+        updateTaskStatus(task, false);
         return formatLines(
                 " OK, I've marked this task as not done yet:",
                 "   " + task);
@@ -220,8 +219,7 @@ public class Snoopy {
             throws SnoopyException, IOException {
         int taskIndex = getTaskIndex(command, commandType);
         Task task = tasks.get(taskIndex);
-        task.markAsDone();
-        storage.save(tasks);
+        updateTaskStatus(task, true);
         return formatLines(
                 " Nice! I've marked this task as done:",
                 "   " + task);
@@ -240,7 +238,12 @@ public class Snoopy {
             throws SnoopyException, IOException {
         int taskIndex = getTaskIndex(command, commandType);
         Task removedTask = tasks.remove(taskIndex);
-        storage.save(tasks);
+        try {
+            storage.save(tasks);
+        } catch (IOException exception) {
+            tasks.add(taskIndex, removedTask);
+            throw exception;
+        }
         return formatLines(
                 " Noted. I've removed this task:",
                 "   " + removedTask,
@@ -289,6 +292,33 @@ public class Snoopy {
      */
     private String getTaskListResponse() {
         return " Here are the tasks in your list:" + formatNumberedTasks(tasks);
+    }
+
+    /**
+     * Changes a task's completion state and restores it if saving fails.
+     *
+     * @param task Task whose state should change.
+     * @param shouldMarkDone Whether the task should be marked as done.
+     * @throws IOException If the task list cannot be saved.
+     */
+    private void updateTaskStatus(Task task, boolean shouldMarkDone) throws IOException {
+        boolean wasDone = task.isDone();
+        if (shouldMarkDone) {
+            task.markAsDone();
+        } else {
+            task.markAsNotDone();
+        }
+
+        try {
+            storage.save(tasks);
+        } catch (IOException exception) {
+            if (wasDone) {
+                task.markAsDone();
+            } else {
+                task.markAsNotDone();
+            }
+            throw exception;
+        }
     }
 
     /**
@@ -385,6 +415,9 @@ public class Snoopy {
         if (byIndex < 0) {
             throw new SnoopyException("Please use: deadline <description> /by <date or time>.");
         }
+        if (hasRepeatedDelimiter(command, " /by ")) {
+            throw new SnoopyException("A deadline must contain exactly one '/by' separator.");
+        }
         String description = command.substring(commandType.getKeyword().length(), byIndex).trim();
         String byText = command.substring(byIndex + 5).trim();
         if (description.isEmpty() || byText.isEmpty()) {
@@ -410,6 +443,10 @@ public class Snoopy {
         if (fromIndex < 0 || toIndex < 0 || fromIndex >= toIndex) {
             throw new SnoopyException("Please use: event <description> /from <start> /to <end>.");
         }
+        if (hasRepeatedDelimiter(command, " /from ") || hasRepeatedDelimiter(command, " /to ")) {
+            throw new SnoopyException(
+                    "An event must contain exactly one '/from' and one '/to' separator.");
+        }
         if (fromIndex + 7 > toIndex) {
             throw new SnoopyException(
                     "An event needs a description, a '/from' value, and a '/to' value.");
@@ -428,7 +465,22 @@ public class Snoopy {
         if (to.isBefore(from)) {
             throw new SnoopyException("The event end date cannot be before its start date.");
         }
+        if (to.equals(from)) {
+            throw new SnoopyException("The event end date must be after its start date.");
+        }
         return saveNewTask(new Event(description, from, to));
+    }
+
+    /**
+     * Checks whether a command contains a delimiter more than once.
+     *
+     * @param command Complete command to inspect.
+     * @param delimiter Delimiter including its required surrounding spaces.
+     * @return {@code true} when the delimiter occurs at least twice.
+     */
+    private static boolean hasRepeatedDelimiter(String command, String delimiter) {
+        int firstIndex = command.indexOf(delimiter);
+        return firstIndex >= 0 && command.indexOf(delimiter, firstIndex + delimiter.length()) >= 0;
     }
 
     /**
@@ -442,7 +494,12 @@ public class Snoopy {
         assert task != null : "A new task must be created before it can be saved";
         tasks.add(task);
         assert tasks.get(tasks.size() - 1) == task : "The new task must be appended to the task list";
-        storage.save(tasks);
+        try {
+            storage.save(tasks);
+        } catch (IOException exception) {
+            tasks.remove(tasks.size() - 1);
+            throw exception;
+        }
         return formatLines(
                 " Got it. I've added this task:",
                 "   " + task,
