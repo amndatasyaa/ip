@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.io.TempDir;
 import snoopy.exception.SnoopyException;
 import snoopy.task.Deadline;
 import snoopy.task.Event;
-import snoopy.task.Task;
+import snoopy.task.TaskList;
 import snoopy.task.Todo;
 
 /**
@@ -37,7 +37,7 @@ public class StorageTest {
     public void load_missingDataFile_returnsEmptyList() throws IOException, SnoopyException {
         Storage storage = new Storage(temporaryDirectory.resolve("data/snoopy.txt"));
 
-        assertEquals(new ArrayList<>(), storage.load());
+        assertEquals(0, storage.load().size());
     }
 
     @Test
@@ -45,7 +45,7 @@ public class StorageTest {
         Path dataFile = temporaryDirectory.resolve("nested/data/snoopy.txt");
         Storage storage = new Storage(dataFile);
 
-        storage.save(new ArrayList<>());
+        storage.save(new TaskList());
 
         assertTrue(Files.exists(dataFile));
         assertEquals("", Files.readString(dataFile));
@@ -57,7 +57,7 @@ public class StorageTest {
         Files.createFile(dataFile);
         Storage storage = new Storage(dataFile);
 
-        assertEquals(new ArrayList<>(), storage.load());
+        assertEquals(0, storage.load().size());
     }
 
     @Test
@@ -65,7 +65,7 @@ public class StorageTest {
             throws IOException, SnoopyException {
         Path dataFile = temporaryDirectory.resolve("nested/data/snoopy.txt");
         Storage storage = new Storage(dataFile);
-        ArrayList<Task> originalTasks = new ArrayList<>();
+        TaskList originalTasks = new TaskList();
         originalTasks.add(new Todo("read book"));
         originalTasks.add(new Deadline("return book", LocalDate.of(2026, 8, 30)));
         originalTasks.add(new Event("meeting", LocalDate.of(2026, 9, 1),
@@ -73,7 +73,7 @@ public class StorageTest {
         originalTasks.get(1).markAsDone();
 
         storage.save(originalTasks);
-        ArrayList<Task> loadedTasks = storage.load();
+        TaskList loadedTasks = storage.load();
 
         assertEquals(3, loadedTasks.size());
         assertInstanceOf(Todo.class, loadedTasks.get(0));
@@ -106,7 +106,7 @@ public class StorageTest {
                 + "E | 1 | done event | 2026-09-01 | 2026-09-02\n");
         Storage storage = new Storage(dataFile);
 
-        ArrayList<Task> tasks = storage.load();
+        TaskList tasks = storage.load();
 
         assertEquals("[T][X] done todo", tasks.get(0).toString());
         assertEquals("[E][X] done event (from: Sep 01 2026 to: Sep 02 2026)",
@@ -155,7 +155,7 @@ public class StorageTest {
         Files.writeString(parentFile, "content");
         Storage storage = new Storage(parentFile.resolve("snoopy.txt"));
 
-        assertThrows(IOException.class, () -> storage.save(new ArrayList<>()));
+        assertThrows(IOException.class, () -> storage.save(new TaskList()));
     }
 
     @Test
@@ -166,10 +166,8 @@ public class StorageTest {
     @Test
     public void save_invalidTaskLists_failAssertions() {
         Storage storage = new Storage(temporaryDirectory.resolve("assertions.txt"));
-        ArrayList<Task> tasksWithNull = new ArrayList<>();
-        tasksWithNull.add(null);
-
         assertThrows(AssertionError.class, () -> storage.save(null));
-        assertThrows(AssertionError.class, () -> storage.save(tasksWithNull));
+        assertThrows(AssertionError.class, () ->
+                new TaskList(Collections.singletonList(null)));
     }
 }

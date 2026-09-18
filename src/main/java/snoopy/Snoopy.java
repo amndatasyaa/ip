@@ -1,39 +1,27 @@
 package snoopy;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import snoopy.command.CommandType;
 import snoopy.exception.SnoopyException;
+import snoopy.parser.Parser;
 import snoopy.storage.Storage;
-import snoopy.task.Deadline;
-import snoopy.task.Event;
 import snoopy.task.Task;
-import snoopy.task.Todo;
+import snoopy.task.TaskList;
+import snoopy.ui.Ui;
 
 /**
  * Processes Snoopy commands for both the text and graphical user interfaces.
  */
 public class Snoopy {
     private static final String DISPLAY_NAME = "Snoopy";
-    private static final String DIVIDER = "____________________________________________________________";
-    private static final String BANNER = "  ____\n"
-            + " / ___| _ __   ___   ___  _ __  _   _\n"
-            + " \\___ \\| '_ \\ / _ \\ / _ \\| '_ \\| | | |\n"
-            + "  ___) | | | | (_) | (_) | |_) | |_| |\n"
-            + " |____/|_| |_|\\___/ \\___/| .__/ \\__, |\n"
-            + "                            |_|    |___/";
     private static final String WELCOME_MESSAGE = "Hi! I'm Snoopy, your happy little helper.\n"
             + "What can I do for you?";
 
     private final Storage storage;
-    private final ArrayList<Task> tasks;
+    private final TaskList tasks;
     private final String startupError;
     private boolean shouldExit;
 
@@ -53,15 +41,15 @@ public class Snoopy {
         assert storage != null : "Storage must be provided";
         this.storage = storage;
 
-        ArrayList<Task> loadedTasks;
+        TaskList loadedTasks;
         String loadError = null;
         try {
             loadedTasks = storage.load();
         } catch (SnoopyException exception) {
-            loadedTasks = new ArrayList<>();
+            loadedTasks = new TaskList();
             loadError = " OOPS! " + exception.getMessage();
         } catch (IOException exception) {
-            loadedTasks = new ArrayList<>();
+            loadedTasks = new TaskList();
             loadError = " OOPS! I couldn't load the saved tasks.";
         }
         assert loadedTasks != null : "Storage must return a task list";
@@ -76,20 +64,10 @@ public class Snoopy {
      */
     public static void main(String[] args) {
         Snoopy snoopy = new Snoopy();
-
-        System.out.println(DIVIDER);
-        System.out.println(BANNER);
-        System.out.println(WELCOME_MESSAGE);
-        System.out.println(DIVIDER);
-        if (snoopy.startupError != null) {
-            System.out.println(snoopy.startupError);
-            System.out.println(DIVIDER);
-        }
-
-        Scanner scanner = new Scanner(System.in);
-        while (scanner.hasNextLine() && !snoopy.shouldExit()) {
-            System.out.println(snoopy.getResponse(scanner.nextLine()));
-            System.out.println(DIVIDER);
+        Ui ui = new Ui();
+        ui.showWelcome(snoopy.getWelcomeMessage());
+        while (ui.hasNextCommand() && !snoopy.shouldExit()) {
+            ui.showResponse(snoopy.getResponse(ui.readCommand()));
         }
     }
 
@@ -130,8 +108,8 @@ public class Snoopy {
      * @return Snoopy's response, which can contain multiple lines.
      */
     public String getResponse(String input) {
-        String command = input == null ? "" : input.trim();
-        CommandType commandType = CommandType.fromCommand(command);
+        String command = Parser.normalizeInput(input);
+        CommandType commandType = Parser.parseCommandType(command);
         assert commandType == CommandType.UNKNOWN
                 || command.startsWith(commandType.getKeyword())
                 : "Recognized commands must start with their keyword";
@@ -173,11 +151,9 @@ public class Snoopy {
             case UPDATE:
                 return updateTask(command, commandType);
             case TODO:
-                return addTodo(command, commandType);
             case DEADLINE:
-                return addDeadline(command, commandType);
             case EVENT:
-                return addEvent(command, commandType);
+                return saveNewTask(Parser.parseTask(command, commandType));
             case UNKNOWN:
                 throw new SnoopyException(
                         "Sorry, I don't recognize that command. Available commands: "
@@ -259,21 +235,8 @@ public class Snoopy {
      * @throws SnoopyException If the task number is invalid.
      */
     private int getTaskIndex(String command, CommandType commandType) throws SnoopyException {
-        String numberText = getArguments(command, commandType);
-        return parseTaskIndex(numberText, tasks.size(), commandType);
-    }
-
-    /**
-     * Returns the trimmed arguments that follow a recognized command keyword.
-     *
-     * @param command Complete trimmed command.
-     * @param commandType Type identified from the command.
-     * @return Command arguments, or an empty string when none were supplied.
-     */
-    private static String getArguments(String command, CommandType commandType) {
-        assert command.startsWith(commandType.getKeyword())
-                : "Command must start with its recognized keyword";
-        return command.substring(commandType.getKeyword().length()).trim();
+        String numberText = Parser.getArguments(command, commandType);
+        return Parser.parseTaskIndex(numberText, tasks.size(), commandType);
     }
 
     /**
@@ -330,15 +293,13 @@ public class Snoopy {
      * @throws SnoopyException If the keyword is empty.
      */
     private String getFindResponse(String command, CommandType commandType) throws SnoopyException {
-        String keyword = getArguments(command, commandType);
+        String keyword = Parser.getArguments(command, commandType);
         if (keyword.isEmpty()) {
             throw new SnoopyException(
                     "I need a scent to follow. Please provide a keyword to find.");
         }
 
-        List<Task> matchingTasks = tasks.stream()
-                .filter(task -> task.containsKeyword(keyword))
-                .toList();
+        TaskList matchingTasks = tasks.find(keyword);
         return " I sniffed out these matching tasks:" + formatNumberedTasks(matchingTasks);
     }
 
@@ -353,16 +314,10 @@ public class Snoopy {
      */
     private String updateTask(String command, CommandType commandType)
             throws SnoopyException, IOException {
-        String arguments = getArguments(command, commandType);
-        String[] fields = arguments.split("\\s+", 2);
-        if (fields.length < 2 || fields[1].isBlank()) {
-            throw new SnoopyException(
-                    "Please use: update <task number> <new description>.");
-        }
-
-        int taskIndex = parseTaskIndex(fields[0], tasks.size(), commandType);
-        Task task = tasks.get(taskIndex);
-        task.updateDescription(fields[1].trim());
+        Parser.UpdateDetails updateDetails = Parser.parseUpdate(
+                command, tasks.size(), commandType);
+        Task task = tasks.get(updateDetails.getTaskIndex());
+        task.updateDescription(updateDetails.getDescription());
         storage.save(tasks);
         return formatLines(
                 " Got it. I've updated this task:",
@@ -375,112 +330,12 @@ public class Snoopy {
      * @param tasksToFormat Tasks to number in their existing order.
      * @return Numbered task lines, or an empty string when there are no tasks.
      */
-    private static String formatNumberedTasks(List<Task> tasksToFormat) {
+    private static String formatNumberedTasks(TaskList tasksToFormat) {
         assert tasksToFormat != null : "Task list must be provided for formatting";
         String numberedTasks = IntStream.range(0, tasksToFormat.size())
                 .mapToObj(index -> " " + (index + 1) + "." + tasksToFormat.get(index))
                 .collect(Collectors.joining("\n"));
         return numberedTasks.isEmpty() ? "" : "\n" + numberedTasks;
-    }
-
-    /**
-     * Adds a todo from a validated command.
-     *
-     * @param command Complete todo command.
-     * @param commandType Todo command metadata.
-     * @return Confirmation shown to the user.
-     * @throws SnoopyException If the description is empty.
-     * @throws IOException If the task cannot be saved.
-     */
-    private String addTodo(String command, CommandType commandType) throws SnoopyException, IOException {
-        String description = getArguments(command, commandType);
-        if (description.isEmpty()) {
-            throw new SnoopyException("Please tell me what to add after 'todo'.");
-        }
-        return saveNewTask(new Todo(description));
-    }
-
-    /**
-     * Adds a deadline from a validated command.
-     *
-     * @param command Complete deadline command.
-     * @param commandType Deadline command metadata.
-     * @return Confirmation shown to the user.
-     * @throws SnoopyException If required fields or the date are invalid.
-     * @throws IOException If the task cannot be saved.
-     */
-    private String addDeadline(String command, CommandType commandType)
-            throws SnoopyException, IOException {
-        int byIndex = command.indexOf(" /by ");
-        if (byIndex < 0) {
-            throw new SnoopyException("Please use: deadline <description> /by <date or time>.");
-        }
-        if (hasRepeatedDelimiter(command, " /by ")) {
-            throw new SnoopyException("A deadline must contain exactly one '/by' separator.");
-        }
-        String description = command.substring(commandType.getKeyword().length(), byIndex).trim();
-        String byText = command.substring(byIndex + 5).trim();
-        if (description.isEmpty() || byText.isEmpty()) {
-            throw new SnoopyException("A deadline needs both a description and a '/by' value.");
-        }
-
-        LocalDate by = parseDate(byText, commandType);
-        return saveNewTask(new Deadline(description, by));
-    }
-
-    /**
-     * Adds an event from a validated command.
-     *
-     * @param command Complete event command.
-     * @param commandType Event command metadata.
-     * @return Confirmation shown to the user.
-     * @throws SnoopyException If required fields or either date are invalid.
-     * @throws IOException If the task cannot be saved.
-     */
-    private String addEvent(String command, CommandType commandType) throws SnoopyException, IOException {
-        int fromIndex = command.indexOf(" /from ");
-        int toIndex = command.indexOf(" /to ");
-        if (fromIndex < 0 || toIndex < 0 || fromIndex >= toIndex) {
-            throw new SnoopyException("Please use: event <description> /from <start> /to <end>.");
-        }
-        if (hasRepeatedDelimiter(command, " /from ") || hasRepeatedDelimiter(command, " /to ")) {
-            throw new SnoopyException(
-                    "An event must contain exactly one '/from' and one '/to' separator.");
-        }
-        if (fromIndex + 7 > toIndex) {
-            throw new SnoopyException(
-                    "An event needs a description, a '/from' value, and a '/to' value.");
-        }
-
-        String description = command.substring(commandType.getKeyword().length(), fromIndex).trim();
-        String fromText = command.substring(fromIndex + 7, toIndex).trim();
-        String toText = command.substring(toIndex + 5).trim();
-        if (description.isEmpty() || fromText.isEmpty() || toText.isEmpty()) {
-            throw new SnoopyException(
-                    "An event needs a description, a '/from' value, and a '/to' value.");
-        }
-
-        LocalDate from = parseDate(fromText, commandType);
-        LocalDate to = parseDate(toText, commandType);
-        if (to.isBefore(from)) {
-            throw new SnoopyException("The event end date cannot be before its start date.");
-        }
-        if (to.equals(from)) {
-            throw new SnoopyException("The event end date must be after its start date.");
-        }
-        return saveNewTask(new Event(description, from, to));
-    }
-
-    /**
-     * Checks whether a command contains a delimiter more than once.
-     *
-     * @param command Complete command to inspect.
-     * @param delimiter Delimiter including its required surrounding spaces.
-     * @return {@code true} when the delimiter occurs at least twice.
-     */
-    private static boolean hasRepeatedDelimiter(String command, String delimiter) {
-        int firstIndex = command.indexOf(delimiter);
-        return firstIndex >= 0 && command.indexOf(delimiter, firstIndex + delimiter.length()) >= 0;
     }
 
     /**
@@ -520,65 +375,4 @@ public class Snoopy {
         return String.join("\n", lines);
     }
 
-    /**
-     * Parses an ISO date used by a deadline or event command.
-     *
-     * @param dateText Date entered by the user.
-     * @param commandType Command whose date is being parsed.
-     * @return Parsed date.
-     * @throws SnoopyException If the text is not a valid {@code yyyy-MM-dd} date.
-     */
-    private static LocalDate parseDate(String dateText, CommandType commandType)
-            throws SnoopyException {
-        assert commandType == CommandType.DEADLINE || commandType == CommandType.EVENT
-                : "Only deadline and event commands contain dates";
-        try {
-            return LocalDate.parse(dateText);
-        } catch (DateTimeParseException exception) {
-            String subject = commandType == CommandType.DEADLINE
-                    ? "the deadline date" : "event dates";
-            throw new SnoopyException(
-                    "Please enter " + subject
-                            + " as yyyy-MM-dd, for example 2019-10-15.");
-        }
-    }
-
-    /**
-     * Converts a user-supplied task number into a valid array index.
-     *
-     * @param numberText Task number entered by the user.
-     * @param taskCount Number of tasks currently stored.
-     * @param commandType Command that requires the task number.
-     * @return The zero-based index of the selected task.
-     * @throws SnoopyException If the number is missing, non-numeric, or outside the list.
-     */
-    private static int parseTaskIndex(String numberText, int taskCount, CommandType commandType)
-            throws SnoopyException {
-        assert taskCount >= 0 : "Task count cannot be negative";
-        if (numberText.isEmpty()) {
-            throw new SnoopyException(
-                    "Please provide a task number, for example '"
-                            + commandType.getKeyword() + " 2'.");
-        }
-
-        int taskNumber;
-        try {
-            taskNumber = Integer.parseInt(numberText);
-        } catch (NumberFormatException exception) {
-            throw new SnoopyException("'" + numberText + "' is not a valid task number.");
-        }
-
-        if (taskCount == 0) {
-            throw new SnoopyException(
-                    "Your task list is empty, so there is no task to "
-                            + commandType.getKeyword() + ".");
-        }
-        if (taskNumber < 1 || taskNumber > taskCount) {
-            throw new SnoopyException(
-                    "Task " + taskNumber + " does not exist. Choose a number from 1 to " + taskCount + ".");
-        }
-        int taskIndex = taskNumber - 1;
-        assert taskIndex >= 0 && taskIndex < taskCount : "Parsed task index must be within the task list";
-        return taskIndex;
-    }
 }

@@ -8,14 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import snoopy.exception.SnoopyException;
 import snoopy.storage.Storage;
-import snoopy.task.Task;
+import snoopy.task.TaskList;
 
 /**
  * Tests the response API shared by Snoopy's text and graphical interfaces.
@@ -340,7 +339,7 @@ public class SnoopyTest {
         }
 
         @Override
-        public ArrayList<Task> load() throws IOException, SnoopyException {
+        public TaskList load() throws IOException, SnoopyException {
             if (shouldFailLoad) {
                 throw new IOException("Simulated read failure");
             }
@@ -348,7 +347,7 @@ public class SnoopyTest {
         }
 
         @Override
-        public void save(ArrayList<Task> tasks) throws IOException {
+        public void save(TaskList tasks) throws IOException {
             if (shouldFailSave) {
                 throw new IOException("Simulated write failure");
             }
