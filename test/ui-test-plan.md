@@ -997,7 +997,7 @@ ____________________________________________________________
 ____________________________________________________________
 ```
 
-## UI-17: Reject repeated date delimiters and zero-length events
+## UI-18: Reject repeated date delimiters and zero-length events
 
 **Aim:** Verify that ambiguous date delimiters and equal event dates are rejected without changing the existing task list.
 
