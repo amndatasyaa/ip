@@ -57,6 +57,63 @@ ____________________________________________________________
 ____________________________________________________________
 ```
 
+## UI-17: Update a task description without replacing the task
+
+**Aim:** Verify that updating a description preserves the task's type, date, and completion state, while an invalid
+update leaves the edited task unchanged.
+
+### Input
+
+```text
+deadline return book /by 2026-08-30
+mark 1
+update 1 return all library books
+update
+update 1
+update one unchanged
+update 2 unchanged
+list
+bye
+```
+
+### Expected output
+
+```text
+____________________________________________________________
+  ____
+ / ___| _ __   ___   ___  _ __  _   _
+ \___ \| '_ \ / _ \ / _ \| '_ \| | | |
+  ___) | | | | (_) | (_) | |_) | |_| |
+ |____/|_| |_|\___/ \___/| .__/ \__, |
+                            |_|    |___/
+Hi! I'm Snoopy, your happy little helper.
+What can I do for you?
+____________________________________________________________
+ Got it. I've added this task:
+   [D][ ] return book (by: Aug 30 2026)
+ Now you have 1 tasks in the list.
+____________________________________________________________
+ Nice! I've marked this task as done:
+   [D][X] return book (by: Aug 30 2026)
+____________________________________________________________
+ Got it. I've updated this task:
+   [D][X] return all library books (by: Aug 30 2026)
+____________________________________________________________
+ OOPS! Please use: update <task number> <new description>.
+____________________________________________________________
+ OOPS! Please use: update <task number> <new description>.
+____________________________________________________________
+ OOPS! 'one' is not a valid task number.
+____________________________________________________________
+ OOPS! Task 2 does not exist. Choose a number from 1 to 1.
+____________________________________________________________
+ Here are the tasks in your list:
+ 1.[D][X] return all library books (by: Aug 30 2026)
+____________________________________________________________
+ Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
 ## UI-16: Reject an event ending before it starts
 
 **Aim:** Verify that a reversed event date range is rejected without changing the existing task list.
@@ -361,7 +418,7 @@ What can I do for you?
 ____________________________________________________________
  OOPS! Please tell me what to add after 'todo'.
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, todo, deadline, event.
+ OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, update, todo, deadline, event.
 ____________________________________________________________
  Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -602,7 +659,7 @@ ____________________________________________________________
 Hi! I'm Snoopy, your happy little helper.
 What can I do for you?
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, todo, deadline, event.
+ OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, update, todo, deadline, event.
 ____________________________________________________________
  Got it. I've added this task:
    [T][ ] spaced task
@@ -614,11 +671,11 @@ ____________________________________________________________
 ____________________________________________________________
  OOPS! '1 extra' is not a valid task number.
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, todo, deadline, event.
+ OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, update, todo, deadline, event.
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, todo, deadline, event.
+ OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, update, todo, deadline, event.
 ____________________________________________________________
- OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, todo, deadline, event.
+ OOPS! Sorry, I don't recognize that command. Available commands: bye, list, mark, unmark, delete, find, update, todo, deadline, event.
 ____________________________________________________________
  Here are the tasks in your list:
  1.[T][ ] spaced task

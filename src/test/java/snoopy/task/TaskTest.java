@@ -52,4 +52,15 @@ public class TaskTest {
         assertFalse(task.containsKeyword("book"));
         assertFalse(task.containsKeyword("Aug 30"));
     }
+
+    @Test
+    public void updateDescription_completedDeadline_preservesTypeDateAndStatus() {
+        Task task = new Deadline("return Book", LocalDate.of(2026, 8, 30));
+        task.markAsDone();
+
+        task.updateDescription("return library books");
+
+        assertEquals("D | 1 | return library books | 2026-08-30", task.toDataString());
+        assertEquals("[D][X] return library books (by: Aug 30 2026)", task.toString());
+    }
 }

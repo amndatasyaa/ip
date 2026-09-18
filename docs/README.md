@@ -27,10 +27,11 @@ Dates must use the `yyyy-MM-dd` format, such as `2026-09-17`.
 | Mark a task incomplete | `unmark <number>` | `unmark 2` |
 | Delete a task | `delete <number>` | `delete 2` |
 | Find tasks | `find <keyword>` | `find report` |
+| Update a task description | `update <number> <new description>` | `update 2 submit final report` |
 | Exit Snoopy | `bye` | `bye` |
 
 Task numbers are shown by `list`. They can change after a task is deleted, so run `list` again before
-using `mark`, `unmark`, or `delete` if you are unsure.
+using `mark`, `unmark`, `delete`, or `update` if you are unsure.
 
 ## Working with tasks
 
@@ -69,6 +70,15 @@ Snoopy displays an error message when a command is incomplete or invalid. Check 
 - deadline and event commands contain their required `/by`, `/from`, and `/to` markers.
 
 An invalid command does not change your task list, so you can correct it and try again.
+
+## Updating a task description
+
+Use `update <number> <new description>` to correct a task's description without changing its type,
+dates, or completion state:
+
+```text
+update 2 return all library books
+```
 
 ## Exiting
 
