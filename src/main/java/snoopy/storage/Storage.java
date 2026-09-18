@@ -5,13 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 import snoopy.exception.SnoopyException;
 import snoopy.task.Deadline;
 import snoopy.task.Event;
 import snoopy.task.Task;
+import snoopy.task.TaskList;
 import snoopy.task.Todo;
 
 /**
@@ -43,9 +43,8 @@ public class Storage {
      * @param tasks Current tasks to save.
      * @throws IOException If the folder or file cannot be written.
      */
-    public void save(ArrayList<Task> tasks) throws IOException {
+    public void save(TaskList tasks) throws IOException {
         assert tasks != null : "Task list must be provided when saving";
-        assert !tasks.contains(null) : "Task list must not contain null entries";
         List<String> lines = tasks.stream()
                 .map(Task::toDataString)
                 .toList();
@@ -60,13 +59,13 @@ public class Storage {
      * @throws IOException If an existing data file cannot be read.
      * @throws SnoopyException If a saved line does not follow the expected format.
      */
-    public ArrayList<Task> load() throws IOException, SnoopyException {
-        ArrayList<Task> tasks = new ArrayList<>();
+    public TaskList load() throws IOException, SnoopyException {
+        TaskList tasks = new TaskList();
         if (!Files.exists(filePath)) {
             return tasks;
         }
 
-        ArrayList<String> lines = new ArrayList<>(Files.readAllLines(filePath));
+        List<String> lines = Files.readAllLines(filePath);
         for (int i = 0; i < lines.size(); i++) {
             tasks.add(parseTask(lines.get(i), i + 1));
         }
