@@ -63,13 +63,15 @@ public class DialogBox extends HBox {
 
     /**
      * Aligns a Snoopy reply to the left and applies its reply style.
+     *
+     * @param replyStyleClass CSS class that controls the reply's appearance.
      */
-    private void flip() {
+    private void flip(String replyStyleClass) {
         ObservableList<Node> children = FXCollections.observableArrayList(getChildren());
         Collections.reverse(children);
         getChildren().setAll(children);
         setAlignment(Pos.TOP_LEFT);
-        dialog.getStyleClass().add("reply-label");
+        dialog.getStyleClass().add(replyStyleClass);
     }
 
     /**
@@ -91,7 +93,20 @@ public class DialogBox extends HBox {
      */
     public static DialogBox getSnoopyDialog(String text, Image image) {
         DialogBox dialogBox = new DialogBox(text, image);
-        dialogBox.flip();
+        dialogBox.flip("reply-label");
+        return dialogBox;
+    }
+
+    /**
+     * Creates a visually highlighted dialog box for an error response.
+     *
+     * @param text Error text sent by Snoopy.
+     * @param image Snoopy's display picture.
+     * @return Dialog box styled to draw attention to the error.
+     */
+    public static DialogBox getErrorDialog(String text, Image image) {
+        DialogBox dialogBox = new DialogBox(text, image);
+        dialogBox.flip("error-label");
         return dialogBox;
     }
 }

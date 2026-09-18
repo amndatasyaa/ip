@@ -8,6 +8,8 @@ The graphical interface also requires these personality checks because visual pr
 - Black, white, and Snoopy-red colors give the interface a classic comic-inspired theme.
 - Snoopy replies show the circular-cropped black-and-white beagle avatar, while user messages remain text-only.
 - Every message bubble has evenly rounded corners, and the action button is labeled "Send".
+- Invalid commands use Snoopy's red error dialog style, while valid replies retain the neutral reply style.
+- Resizing the window keeps the conversation pane and input controls usable.
 
 ## UI-01: Add and list all task types
 
