@@ -9,6 +9,12 @@ import org.junit.jupiter.api.Test;
  */
 public class CommandTypeTest {
     @Test
+    public void getCommandSummary_allSupportedCommands_excludesUnknownType() {
+        assertEquals("bye, list, mark, unmark, delete, find, update, todo, deadline, event",
+                CommandType.getCommandSummary());
+    }
+
+    @Test
     public void fromCommand_supportedCommands_returnsMatchingTypes() {
         assertEquals(CommandType.BYE, CommandType.fromCommand("bye"));
         assertEquals(CommandType.LIST, CommandType.fromCommand("list"));

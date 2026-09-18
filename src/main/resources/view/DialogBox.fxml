@@ -27,8 +27,8 @@
             </padding>
         </Label>
         <ImageView fx:id="displayPicture"
-                   fitHeight="64.0"
-                   fitWidth="64.0"
+                   fitHeight="56.0"
+                   fitWidth="56.0"
                    pickOnBounds="true"
                    preserveRatio="true" />
     </children>

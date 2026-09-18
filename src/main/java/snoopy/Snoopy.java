@@ -21,6 +21,7 @@ import snoopy.task.Todo;
  * Processes Snoopy commands for both the text and graphical user interfaces.
  */
 public class Snoopy {
+    private static final String DISPLAY_NAME = "Snoopy";
     private static final String DIVIDER = "____________________________________________________________";
     private static final String BANNER = "  ____\n"
             + " / ___| _ __   ___   ___  _ __  _   _\n"
@@ -93,7 +94,7 @@ public class Snoopy {
     }
 
     /**
-     * Returns the greeting shown when the graphical interface starts.
+     * Returns the greeting shown when the text interface starts.
      *
      * @return Greeting and any storage-loading error.
      */
@@ -102,6 +103,24 @@ public class Snoopy {
             return WELCOME_MESSAGE;
         }
         return WELCOME_MESSAGE + "\n\n" + startupError.stripLeading();
+    }
+
+    /**
+     * Returns Snoopy's greeting for the graphical interface.
+     *
+     * @return Graphical greeting and any storage-loading error.
+     */
+    public String getGuiWelcomeMessage() {
+        return getWelcomeMessage();
+    }
+
+    /**
+     * Returns the chatbot name displayed by the graphical interface.
+     *
+     * @return Snoopy's display name.
+     */
+    public String getDisplayName() {
+        return DISPLAY_NAME;
     }
 
     /**
@@ -161,8 +180,8 @@ public class Snoopy {
                 return addEvent(command, commandType);
             case UNKNOWN:
                 throw new SnoopyException(
-                        "Sorry, I don't recognize that command. "
-                                + "Try todo, deadline, event, list, mark, unmark, delete, find, or update.");
+                        "Sorry, I don't recognize that command. Available commands: "
+                                + CommandType.getCommandSummary() + ".");
             default:
                 throw new IllegalStateException("Unexpected command type: " + commandType);
         }
@@ -237,8 +256,21 @@ public class Snoopy {
      * @throws SnoopyException If the task number is invalid.
      */
     private int getTaskIndex(String command, CommandType commandType) throws SnoopyException {
-        String numberText = command.substring(commandType.getKeyword().length()).trim();
+        String numberText = getArguments(command, commandType);
         return parseTaskIndex(numberText, tasks.size(), commandType);
+    }
+
+    /**
+     * Returns the trimmed arguments that follow a recognized command keyword.
+     *
+     * @param command Complete trimmed command.
+     * @param commandType Type identified from the command.
+     * @return Command arguments, or an empty string when none were supplied.
+     */
+    private static String getArguments(String command, CommandType commandType) {
+        assert command.startsWith(commandType.getKeyword())
+                : "Command must start with its recognized keyword";
+        return command.substring(commandType.getKeyword().length()).trim();
     }
 
     /**
@@ -268,15 +300,16 @@ public class Snoopy {
      * @throws SnoopyException If the keyword is empty.
      */
     private String getFindResponse(String command, CommandType commandType) throws SnoopyException {
-        String keyword = command.substring(commandType.getKeyword().length()).trim();
+        String keyword = getArguments(command, commandType);
         if (keyword.isEmpty()) {
-            throw new SnoopyException("Please provide a keyword to find.");
+            throw new SnoopyException(
+                    "I need a scent to follow. Please provide a keyword to find.");
         }
 
         List<Task> matchingTasks = tasks.stream()
                 .filter(task -> task.containsKeyword(keyword))
                 .toList();
-        return " Here are the matching tasks in your list:" + formatNumberedTasks(matchingTasks);
+        return " I sniffed out these matching tasks:" + formatNumberedTasks(matchingTasks);
     }
 
     /**
@@ -290,7 +323,7 @@ public class Snoopy {
      */
     private String updateTask(String command, CommandType commandType)
             throws SnoopyException, IOException {
-        String arguments = command.substring(commandType.getKeyword().length()).trim();
+        String arguments = getArguments(command, commandType);
         String[] fields = arguments.split("\\s+", 2);
         if (fields.length < 2 || fields[1].isBlank()) {
             throw new SnoopyException(
@@ -330,7 +363,7 @@ public class Snoopy {
      * @throws IOException If the task cannot be saved.
      */
     private String addTodo(String command, CommandType commandType) throws SnoopyException, IOException {
-        String description = command.substring(commandType.getKeyword().length()).trim();
+        String description = getArguments(command, commandType);
         if (description.isEmpty()) {
             throw new SnoopyException("Please tell me what to add after 'todo'.");
         }
@@ -423,6 +456,10 @@ public class Snoopy {
      * @return Lines combined into one response.
      */
     private static String formatLines(String... lines) {
+        assert lines != null : "Response lines must be provided";
+        for (String line : lines) {
+            assert line != null : "Response lines must not contain null values";
+        }
         return String.join("\n", lines);
     }
 

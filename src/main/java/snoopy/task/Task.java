@@ -58,6 +58,7 @@ public class Task {
      * @return {@code true} if the description contains the keyword.
      */
     public boolean containsKeyword(String keyword) {
+        assert keyword != null : "Search keyword must be provided";
         return description.contains(keyword);
     }
 
