@@ -35,11 +35,12 @@ public class UiTest {
         ui.showResponse("Done");
 
         String renderedOutput = output.toString(StandardCharsets.UTF_8);
+        String lineSeparator = System.lineSeparator();
         assertTrue(renderedOutput.contains("____"));
-        assertTrue(renderedOutput.contains("Hello\n"));
-        assertTrue(renderedOutput.contains("OOPS! Loading failed.\n"));
-        assertTrue(renderedOutput.endsWith("Done\n"
-                + "____________________________________________________________\n"));
+        assertTrue(renderedOutput.contains("Hello" + lineSeparator));
+        assertTrue(renderedOutput.contains("OOPS! Loading failed." + lineSeparator));
+        assertTrue(renderedOutput.endsWith("Done" + lineSeparator
+                + "____________________________________________________________" + lineSeparator));
     }
 
     private Ui createUi(String input, ByteArrayOutputStream output) {
