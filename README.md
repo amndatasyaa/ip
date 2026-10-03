@@ -44,8 +44,8 @@ The generated file is `build/libs/snoopy.jar`. Run it using Java 25:
 java -jar build/libs/snoopy.jar
 ```
 
-The bundled JavaFX libraries allow the JAR to run on Windows, macOS, and Linux without a separate
-JavaFX installation.
+The bundled JavaFX libraries allow the JAR to run without a separate JavaFX installation on the same
+operating system and CPU architecture where it was built. Build a separate JAR on each target platform.
 
 ## Supported commands
 
